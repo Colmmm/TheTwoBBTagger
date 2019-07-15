@@ -1,0 +1,10 @@
+#files for git to not keep track of
+
+#ignore all root files
+*.root
+
+#ignore all txt files
+*.txt
+
+#ignore csv files
+*csv

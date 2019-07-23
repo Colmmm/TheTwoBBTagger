@@ -2,6 +2,8 @@ import numpy as np
 from skhep.math.vectors import Vector3D, LorentzVector
 import pandas as pd
 from fnmatch import filter
+from numpy import array
+from math import sqrt, atan2, cos, sin, acos, degrees, log, pi, sinh
 
 def perp(v):
     """defining a function to find the perpendicular vector to our flight vector"""
@@ -11,6 +13,9 @@ def perp(v):
         else:
             return np.cross(v, [0, 1, 0])
     return np.cross(v, [0, 0, 1])
+
+#simple function for calculating the magnitude of a vector
+mag = lambda x: np.sqrt(x.dot(x))
 
 
 def eta(Vector3D):
@@ -59,17 +64,18 @@ def setpxpypzm(px, py, pz, m):
 
     return self
 
-#defining a lookup table for mass hypothesis in the track_four_momentum function below
-mass_PID_lookup_table = pd.Series(data = [938.27, 493.677, 139.57, 0.511, 105.658],
-                                  index= ['proton', 'kaon', 'pion', 'electron', 'muon' ])
 
-def track_four_momentum(x, three_momentum_labels, PID_labels, PID_classifier):
+def track_four_momentum(x, three_momentum_labels, PID_labels):
     """This function calculates the lorentz four momentum of a given track. It uses the PID information (which are
     just probabilities and then interpreted by PID_classifier)  which determines the particle identity, we then use the
      known rest masses of whatever particle was identified along with the measured 3momentum to initialise the four momentum"""
-    PID_probs = x.loc[PID_labels] #BEWARE labels order, I dont think its significant for now, but could be later
-    PID_pred = PID_classifier.predict(PID_probs)
-    p4_vector = setpxpypzm(three_momentum_labels[0], three_momentum_labels[1], three_momentum_labels[2], mass_PID_lookup_table.iloc[PID_pred])
+    # defining a lookup table for mass hypothesis in the track_four_momentum function below
+    mass_PID_lookup_table = pd.Series(data=[938.27, 493.677, 139.57, 0.511, 105.658], index=PID_labels)
+    PID_probs = x.loc[PID_labels]
+    PID_pred = [idx for idx in PID_labels if x[idx] == PID_probs.max()] #this will hopefully be changed with ML later
+    if PID_probs.loc[filter(PID_probs.index, '*mu')[0]] >= 0.16: #as relative probability for muons are low
+        PID_pred = filter(PID_probs.index, '*mu')
+    p4_vector = setpxpypzm(x[three_momentum_labels[0]], x[three_momentum_labels[1]], x[three_momentum_labels[2]], mass_PID_lookup_table.loc[PID_pred][0])
 
     return p4_vector
 
@@ -92,17 +98,17 @@ def TOF_COM_calculation(df, B_M_nominal = 5279.5 ):
     track1_3p_labels = ['Track1_PX', 'Track1_PY', 'Track1_PZ']
     track2_3p_labels = ['Track2_PX', 'Track2_PY', 'Track2_PZ']
     extra_3p_labels = ['TwoBody_Extra_Px', 'TwoBody_Extra_Py', 'TwoBody_Extra_Pz']
-    #the names of the columns containing the PID probabilities outputted by the NN
-    track1_PID_labels = filter(df.columns, 'Track1_ProbNN*')
-    track2_PID_labels = filter(df.columns, 'Track2_ProbNN*')
-    extra_PID_labels = filter(df.columns, 'TwoBody_Extra_NN*')
+    #the names of the columns containing the PID probabilities outputted by the NN, order makes a difference here (maybe)!!!!
+    track1_PID_labels = ['Track1_ProbNNp', 'Track1_ProbNNk', 'Track1_ProbNNpi', 'Track1_ProbNNe', 'Track1_ProbNNmu']
+    track2_PID_labels = ['Track2_ProbNNp', 'Track2_ProbNNk', 'Track2_ProbNNpi', 'Track2_ProbNNe', 'Track2_ProbNNmu']
+    extra_PID_labels = ['TwoBody_Extra_NNp','TwoBody_Extra_NNk', 'TwoBody_Extra_NNpi', 'TwoBody_Extra_NNe', 'TwoBody_Extra_NNmu']
     #the models of the PID_classifiers
     PID_classifier = ['track1_PID_classifier.pkl', 'track2_PID_classifier.pkl', 'extra_PID_classifier.pkl' ]
     #Now calculate the four momentum of track1, track2 and the extra tracks
     #NB: In the C++ code, the variable track1_p4 is called p4Track1,etc
-    df['track1_p4'] = df.apply(track_four_momentum, axis=1, args=(track1_3p_labels, track1_PID_labels, PID_classifier[0]))
-    df['track2_p4'] = df.apply(track_four_momentum, axis=1, args=(track2_3p_labels, track2_PID_labels, PID_classifier[1]))
-    df['extra_track_p4'] = df.apply(track_four_momentum, axis=1, args=(extra_3p_labels, extra_PID_labels, PID_classifier[2]))
+    df['track1_p4'] = df.apply(track_four_momentum, axis=1, args=(track1_3p_labels, track1_PID_labels))
+    df['track2_p4'] = df.apply(track_four_momentum, axis=1, args=(track2_3p_labels, track2_PID_labels))
+    df['extra_track_p4'] = df.apply(track_four_momentum, axis=1, args=(extra_3p_labels, extra_PID_labels))
 
     # PT estimate based on reconstructed mass and flight vector
     df['pt_est'] = df.apply(lambda x: (B_M_nominal / x.TwoBody_M) * x.tan_theta * x.TwoBody_PZ, axis=1)

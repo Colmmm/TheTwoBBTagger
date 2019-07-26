@@ -102,8 +102,7 @@ def TOF_COM_calculation(df, B_M_nominal = 5279.5 ):
     track1_PID_labels = ['Track1_ProbNNp', 'Track1_ProbNNk', 'Track1_ProbNNpi', 'Track1_ProbNNe', 'Track1_ProbNNmu']
     track2_PID_labels = ['Track2_ProbNNp', 'Track2_ProbNNk', 'Track2_ProbNNpi', 'Track2_ProbNNe', 'Track2_ProbNNmu']
     extra_PID_labels = ['TwoBody_Extra_NNp','TwoBody_Extra_NNk', 'TwoBody_Extra_NNpi', 'TwoBody_Extra_NNe', 'TwoBody_Extra_NNmu']
-    #the models of the PID_classifiers
-    PID_classifier = ['track1_PID_classifier.pkl', 'track2_PID_classifier.pkl', 'extra_PID_classifier.pkl' ]
+
     #Now calculate the four momentum of track1, track2 and the extra tracks
     #NB: In the C++ code, the variable track1_p4 is called p4Track1,etc
     df['track1_p4'] = df.apply(track_four_momentum, axis=1, args=(track1_3p_labels, track1_PID_labels))
@@ -135,4 +134,68 @@ def TOF_COM_calculation(df, B_M_nominal = 5279.5 ):
     return df
 
 
+
+
+
+def MM2_calculator(df, B_M_nominal=5279.5):
+    """Main function to calculate COM values, input is df, and output is same
+    df but with added columns for the COM values"""
+
+    # set up flight related vectors
+    df['pv_vector'] = df.apply(lambda x: array([x.TwoBody_OWNPV_X, x.TwoBody_OWNPV_Y, x.TwoBody_OWNPV_Z]), axis=1)
+    df['sv_vector'] = df.apply(lambda x: array([x.TwoBody_ENDVERTEX_X, x.TwoBody_ENDVERTEX_Y, x.TwoBody_ENDVERTEX_Z]),
+                               axis=1)
+    df['flight'] = df.apply(lambda x: x.sv_vector - x.pv_vector, axis=1)
+    df['tan_theta'] = df.apply(lambda x: mag(perp(x.flight) / x.flight[-1]), axis=1)
+
+    # this is setting the 4momentum of the B meson from kinematic info from Two Body vertex
+    df['p4B'] = df.apply(lambda x: LorentzVector(x.TwoBody_PX, x.TwoBody_PY, x.TwoBody_PZ, x.TwoBody_PE), axis=1)
+
+    # PT estimate based on reconstructed mass and flight vector
+    df['pt_est'] = df.apply(lambda x: (B_M_nominal / x.TwoBody_M) * x.tan_theta * x.TwoBody_PZ, axis=1)
+    # calculating the eta and phi of the flight vector
+    df['flight_eta'] = df.apply(lambda x: eta(Vector3D(x.flight[0], x.flight[1], x.flight[2]).unit()), axis=1)
+    df['flight_phi'] = df.apply(lambda x: Vector3D(x.flight[0], x.flight[1], x.flight[2]).unit().phi(), axis=1)
+    # estimated B candidate for this estimated momentum, measured flight direction and expected true B mass
+    df['p4B_est'] = df.apply(lambda x: my_SetPtEtaPhiM(x.pt_est, x.flight_eta, x.flight_phi, B_M_nominal), axis=1)
+
+    # estimating the boost needed to get to the B's rest frame
+    df['boost_est'] = df.apply(lambda x: boostvector(x.p4B_est), axis=1)
+
+    # calculating the missing mass^2 - this can go negative with resolution
+    df['mm2'] = df.apply(lambda x: (x.p4B_est - x.p4B).mass2, axis=1)
+
+    return df
+
+def Etrack_calculator(df, PX, PY, PZ, proton_prob, kaon_prob, pion_prob, electron_prob, muon_prob, name):
+    # Define the right parameters for the track_four_momentum function
+    # the names of the columns of df containing the 3momentum of track1, track2 and the extra tracks
+    three_momentum = [PX, PY, PZ]
+
+    # the names of the columns containing the PID probabilities outputted by the NN's
+    PID_probs = [proton_prob, kaon_prob, pion_prob, electron_prob, muon_prob ]
+
+    # Now calculate the four momentum of track1, track2 and the extra tracks
+    # NB: In the C++ code, the variable track1_p4 is called p4Track1,etc
+    df[name +'_p4'] = df.apply(track_four_momentum, axis=1, args=(three_momentum, PID_probs))
+
+    # boosting the tracks to the B's rest frame
+    df[name +'_p4_boosted'] = df.apply(lambda x: x[name +'_p4'].boost(x.boost_est), axis=1)
+
+    # calculate the energy of all tracks in the B's rest frame, ie the COM energy
+    df['E' + name] = df.apply(lambda x: x[name +'_p4_boosted'].t, axis=1)
+
+    return df
+
+def TOF_COM_calculator(df, PXs, PYs, PZs, proton_probs, kaon_probs, pion_probs, electron_probs, muon_probs, names):
+    """"""
+
+    #this adds the missing mass variables to the df
+    df_with_MM2 = MM2_calculator(df)
+
+    #this allows you to select what Etrack caluclations you do, ie, just for Track1/Track2, or just for the extra tracks or all at same time
+    for i in range(len(names)):
+        df_with_MM2_and_Etracks = Etrack_calculator(df_with_MM2, PXs[i], PYs[i], PZs[i], proton_probs[i], kaon_probs[i],
+                                                    pion_probs[i], electron_probs[i], muon_probs[i], names[i])
+    return df_with_MM2_and_Etracks
 

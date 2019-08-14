@@ -151,3 +151,35 @@ def LOF(dfx):
     vector_features = [c for c in df_with_MM2_and_Etracks.columns if type(df_with_MM2_and_Etracks[c].values[0]) in vector_types]
 
     return flatten_vector_features(df=df_with_MM2_and_Etracks, vector_features=vector_features)
+
+def combine(TB_COM_df, ET_COM_df):
+    # I need to add a TB_index column to extra tracks df so I can merge them later
+    TB_COM_df['TB_id'] =  TB_COM_df.apply(lambda x: str(int(x.runNumber)) + str(int(x.eventNumber))+'-'+str(int(x.nCandidate)), axis=1)
+    ET_COM_df['TB_id'] = ET_COM_df.apply(lambda x: str(int(x.runNumber)) + str(int(x.eventNumber)) + '-' + str(int(x.nCandidate)), axis=1)
+
+    count = 0
+    # defining the extra tracks that need to be added, and looping over until theres none left
+    need_adding = ET_COM_df
+    while len(need_adding) != 0:
+
+        # defining the track ids that will be added to the TB_df next
+        being_added = need_adding['TB_id'].drop_duplicates().index.to_list()
+        # we also need to remove these ids from the tracks that need_adding list
+        updated_need_adding_ids = [track for track in need_adding.index if track not in being_added]
+        need_adding = need_adding.loc[updated_need_adding_ids]
+
+        # initialising df to be merged with COM_TB_df, also getting rid of pointless features such as those already in TB df
+        feats = [feat for feat in ET_COM_df.columns if feat not in TB_COM_df.columns + ['__array_index']] + ['TB_id']
+        being_added_df = ET_COM_df.loc[being_added, feats]
+
+        # need to change index of being_added_df so it can be merged with the TB_df
+        being_added_df.index = being_added_df['TB_id']
+        being_added_df = being_added_df.drop(columns=(['TB_id', 'TwoBody_Extra_TRUEPID', 'TwoBody_Extra_FromSameB']))
+        # we also need to change names of the being_added_df columns as we will be adding more than one
+        being_added_df.columns = [name + '_' + str(count) for name in being_added_df.columns]
+        # time to merge the being_added_df to the TB_df
+        TB_COM_df = pd.concat([TB_COM_df, being_added_df], axis=1)
+
+        count += 1
+
+    return TB_COM_df

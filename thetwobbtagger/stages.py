@@ -1,3 +1,10 @@
+from training import CV
+import pandas as pd
+from root_pandas import read_root
+from sklearn.metrics import accuracy_score
+from utils import score_combiner
+path = '../TaggingJpsiK2012_tiny_fix_fix.root'
+
 def firstStage(TBs, threshold, random_seed=42):
     print('\nFirst Stage starting...\n\n')
     probs = CV(twoBBdf=TBs, test_size=0.33, nfolds=8, random_seed=random_seed, array_index=False )
@@ -31,7 +38,7 @@ def thirdStage(TAG_df, TB_scores, path=path, random_seed=42):
                    random_seed=random_seed, justdf=True)
 
     TAG_preds = pd.concat([TAG_probs, TB_scores, event_ids, TAG_labels.SignalB_ID], axis=1);
-    TAG_preds.columns = ['TAG_score', 'TB_scores', 'event_id', 'label']
+    TAG_preds.columns = ['TAG_scores', 'TB_scores', 'event_id', 'label']
     per_event_TAG = TAG_preds.groupby('event_id').apply(score_combiner)
     per_event_TAG = per_event_TAG.groupby('event_id').mean()
 

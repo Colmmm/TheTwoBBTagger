@@ -1,3 +1,6 @@
+import pandas as pd
+from root_pandas import read_root
+
 class twoBBdf:
     def __init__(self, path, dict, categorical_feats=None, specific_TBs=pd.Series(), specific_ETs=pd.Series()):
         self.path =path

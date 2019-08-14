@@ -2,7 +2,7 @@ from thetwobbtagger.dataobjects import twoBBdf
 from thetwobbtagger.stages import firstStage, secondStage, thirdStage
 from thetwobbtagger.lof import LOF, combine
 from thetwobbtagger.names_dict import TB_dict, ET_dict
-path = '../TaggingJpsiK2012_tiny_fix_fix.root'
+path = 'TaggingJpsiK2012_tiny_fix_fix.root'
 
 
 def main():

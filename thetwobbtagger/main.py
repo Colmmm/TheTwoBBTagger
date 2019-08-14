@@ -2,7 +2,7 @@ from dataobjects import twoBBdf
 from stages import firstStage, secondStage, thirdStage
 from lof import LOF, combine
 from names_dict import TB_dict, ET_dict
-path = 'TaggingJpsiK2012_tiny_fix_fix.root'
+path = '../TaggingJpsiK2012_tiny_fix_fix.root'
 
 
 def main():

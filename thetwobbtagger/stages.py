@@ -5,24 +5,26 @@ from sklearn.metrics import accuracy_score
 from utils import score_combiner
 path = '../TaggingJpsiK2012_tiny_fix_fix.root'
 
-def firstStage(TBs, threshold, random_seed=42):
+def firstStage(train_TBs, test_TBs ,threshold, random_seed=42):
     print('\nFirst Stage starting...\n\n')
-    probs = CV(twoBBdf=TBs, test_size=0.33, nfolds=8, random_seed=random_seed, array_index=False )
-    promising_probs = probs[probs>threshold]
+    train_probs, test_probs = CV(train_twoBBdf=train_TBs, test_twoBBdf=test_TBs, nfolds=8, random_seed=random_seed, array_index=False )
+    train_probs = train_probs[train_probs>threshold] ; test_probs = test_probs[test_probs>threshold]
 
-    TB_w_ETs = [r for r in promising_probs.index if
-                r not in ['531373215304339-1', '531373215305125-0', '531373215305125-1']]
-    promising_probs = promising_probs.loc[TB_w_ETs]
+    TB_w_ETs = [r for r in train_probs.index if r not in ['531373215304339-1', '531373215305125-0', '531373215305125-1']]
+    train_probs = train_probs.loc[TB_w_ETs]
+
+    TB_w_ETs = [r for r in test_probs.index if r not in ['5756867770067-1']]
+    test_probs = test_probs.loc[TB_w_ETs]
 
     print('\n\nFirst Stage Complete!!!\n\n')
-    return promising_probs
+    return train_probs, test_probs
 
-def secondStage(ETs, threshold, random_seed=42):
+def secondStage(train_ETs, test_ETs, threshold, random_seed=42):
     print('\nSecond Stage Starting...\n')
-    probs = CV(twoBBdf=ETs, test_size=0.33, nfolds=8, random_seed=random_seed, array_index=True)
-    promising_probs = probs[probs>threshold]
+    train_probs, test_probs = CV(train_twoBBdf=train_ETs, test_twoBBdf=test_ETs, nfolds=8, random_seed=random_seed, array_index=True)
+    train_probs = train_probs[train_probs>threshold] ; test_probs = test_probs[test_probs>threshold]
     print('\n\nSecond Stage Complete!!!\n\n')
-    return promising_probs
+    return train_probs, test_probs
 
 def thirdStage(TAG_df, TB_scores, path=path, random_seed=42):
     print('\n\nStarting Third Stage...\n\n')

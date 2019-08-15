@@ -7,7 +7,7 @@ path = '../TaggingJpsiK2012_tiny_fix_fix.root'
 
 def main():
     TBs = twoBBdf(path=path, dict=TB_dict)
-    promisingTBs = firstStage(TBs, threshold=0.02, random_seed=42)
+    promisingTBs = firstStage(TBs, threshold=0.01, random_seed=42)
     
     ETs = twoBBdf(path=path, dict=ET_dict, specific_TBs=promisingTBs.index )
     promisingETs = secondStage(ETs, threshold=0.5, random_seed=42) ; ETs.specific_ETs = promisingETs.index

@@ -9,6 +9,11 @@ def firstStage(TBs, threshold, random_seed=42):
     print('\nFirst Stage starting...\n\n')
     probs = CV(twoBBdf=TBs, test_size=0.33, nfolds=8, random_seed=random_seed, array_index=False )
     promising_probs = probs[probs>threshold]
+
+    TB_w_ETs = [r for r in promising_probs.index if
+                r not in ['531373215304339-1', '531373215305125-0', '531373215305125-1']]
+    promising_probs = promising_probs.loc[TB_w_ETs]
+
     print('\n\nFirst Stage Complete!!!\n\n')
     return promising_probs
 
@@ -44,6 +49,10 @@ def thirdStage(TAG_df, TB_scores, path=path, random_seed=42):
 
     per_event_TAG = per_event_TAG.drop(per_event_TAG.query('label!=0.0 and label!=1.0').index, axis=0)
 
-    print(accuracy_score(per_event_TAG.label, round(per_event_TAG.pred)))
+    print('\nThird Stage Complete!!\n')
+    acc = accuracy_score(per_event_TAG.label, round(per_event_TAG.pred)) ; print('\nThe final Tagging Accuracy:\n{0}'.format(acc))
+    tag_eff = per_event_TAG.shape[0]/1047 ; print('\nTagging efficiency:\n{0}'.format(tag_eff))
+    print('\n\nOVERALL TAGGING POWER:\n{0}'.format(  tag_eff*(1-2*(1-acc))**2)  )
+
     return per_event_TAG
 

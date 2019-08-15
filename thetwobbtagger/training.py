@@ -40,18 +40,19 @@ def CV(twoBBdf, test_size=0.33, nfolds=5, random_seed=42, array_index=False, jus
         oof.iloc[cv_index] = model.predict_proba(X_train[cv_index])[:,1]
         preds += model.predict_proba((X_test))[:,1] / skf.n_splits
 
-
+    print('\nCalibrating...\n')
     calib_function = prob_calibration_function(y_train, oof)
     oof_calib = pd.Series(calib_function(oof), index=ids1)
     preds_calib = pd.Series(calib_function(preds), index=ids2)
+    print('\nCalibration Complete!\n')
 
-    print('\n\nCross Validation complete...\n\n\n')
-    print('TRAIN OOF EVALUATION:\n\n')
-    print(classification_report(y_train, round(oof_calib)))
-    print('\n\n\nTEST PREDS SCORE:\n\n')
-    print(classification_report(y_test, round(preds_calib)))
-    print(roc_auc_score(y_train, oof_calib), precision_score(y_train, round(oof_calib)), recall_score(y_train, round(oof_calib)))
-    print(roc_auc_score(y_test, preds_calib), precision_score(y_test, round(preds_calib)) , recall_score(y_test, round(preds_calib)))
+    print('\n\nCross Validation complete!!!\n\n')
+    print('\nTRAIN OOF EVALUATION:\n')
+    print('\nROC_AUC_SCORE:\n{0}\n\n\nPRECISION_SCORE:\n{1}\n\n\nRECALL_SCORE:\n{2}\n'.format(
+        roc_auc_score(y_train, oof), precision_score(y_train, round(oof)), recall_score(y_train, round(oof))))
+    print('\n\nTEST PREDS SCORE:\n')
+    print('\nROC_AUC_SCORE:\n{0}\n\n\nPRECISION_SCORE:\n{1}\n\n\nRECALL_SCORE:\n{2}\n'.format(
+        roc_auc_score(y_test, preds), precision_score(y_test, round(preds)) , recall_score(y_test, round(preds))))
 
     all_calib_preds = pd.concat([oof_calib, preds_calib])
 

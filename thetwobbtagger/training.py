@@ -26,7 +26,7 @@ from ml_insights import prob_calibration_function
 
 
 def CV(twoBBdf, test_size=0.33, nfolds=5, random_seed=42, array_index=False, justdf=False):
-    #this if statement if for thirdStage, where we dont have a twoBBdf object for data but just a df, so needs to be treated differently
+    #this if statement is for thirdStage, where we dont have a twoBBdf object for data but just a df, so needs to be treated differently
     if justdf==True:
         df = twoBBdf
         target = 'SignalB_ID'
@@ -84,3 +84,4 @@ def CV(twoBBdf, test_size=0.33, nfolds=5, random_seed=42, array_index=False, jus
     all_calib_preds = pd.concat([oof_calib, preds_calib])
 
     return all_calib_preds
+

@@ -49,10 +49,10 @@ def thirdStage(TAG_df, TB_scores, path=path, random_seed=42):
 
     per_event_TAG = per_event_TAG.drop(per_event_TAG.query('label!=0.0 and label!=1.0').index, axis=0)
 
-    print('\nThird Stage Complete!!\n')
+    print('\n\nThird Stage Complete!!\n')
     acc = accuracy_score(per_event_TAG.label, round(per_event_TAG.pred)) ; print('\nThe final Tagging Accuracy:\n{0}'.format(acc))
-    tag_eff = per_event_TAG.shape[0]/1047 ; print('\nTagging efficiency:\n{0}'.format(tag_eff))
-    print('\n\nOVERALL TAGGING POWER:\n{0}'.format(  tag_eff*(1-2*(1-acc))**2)  )
+    tag_eff = 0.89*(per_event_TAG.shape[0]/1047) ; print('\nTagging efficiency:\n{0}'.format(tag_eff))
+    print('\nOVERALL TAGGING POWER:\n{0}'.format(  tag_eff*(1-2*(1-acc))**2)  )
 
     return per_event_TAG
 

@@ -130,9 +130,12 @@ def CV(train_twoBBdf, test_twoBBdf, nfolds=5, random_seed = 42, array_index=Fals
     print(oof.shape, preds.shape)
     #calibrating the output of the ML algorithm
     print('\nCalibrating...\n')
-    calib_function = prob_calibration_function(y_train, oof)
-    oof_calib = pd.Series(calib_function(oof), index=ids1)
-    preds_calib = pd.Series(calib_function(preds), index=ids2)
+    #calib_function = prob_calibration_function(y_train, oof)
+    #oof_calib = pd.Series(calib_function(oof), index=ids1)
+    #preds_calib = pd.Series(calib_function(preds), index=ids2)
+    print('actually no')
+    oof_calib = oof;
+    preds_calib = preds
     print('\nCalibration Complete!\n')
 
     #Calculating the performance of the model

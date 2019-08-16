@@ -13,7 +13,7 @@ def main():
     
     trainETs = twoBBdf(path=train_path, dict=ET_dict, specific_TBs=trainpromisingTBs.index)
     testETs = twoBBdf(path=test_path, dict=ET_dict, specific_TBs=testpromisingTBs.index)
-    trainpromisingETs, testpromisingETs = secondStage(train_ETs=trainETs, test_ETs=testETs, threshold=0.5, random_seed=42)
+    trainpromisingETs, testpromisingETs = secondStage(train_ETs=trainETs, test_ETs=testETs, threshold=0.1, random_seed=42)
     trainETs.specific_ETs = trainpromisingETs.index ; testETs.specific_ETs = testpromisingETs.index
     
     trainTAG_df = combine(TB_COM_df=LOF(trainTBs), ET_COM_df=LOF(trainETs)) ; testTAG_df = combine(TB_COM_df=LOF(testTBs), ET_COM_df=LOF(testETs))

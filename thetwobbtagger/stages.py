@@ -8,7 +8,7 @@ test_path = '../TaggingJpsiK2012_tiny_fix_fixSlice2.root'
 
 def firstStage(train_TBs, test_TBs ,threshold, random_seed=42):
     print('\nFirst Stage starting...\n\n')
-    train_probs, test_probs = CV(train_twoBBdf=train_TBs, test_twoBBdf=test_TBs, nfolds=8, random_seed=random_seed, array_index=False )
+    train_probs, test_probs = CV(train_twoBBdf=train_TBs, test_twoBBdf=test_TBs, nfolds=2, random_seed=random_seed, array_index=False )
     train_probs = train_probs[train_probs>threshold] ; test_probs = test_probs[test_probs>threshold]
 
     TB_w_ETs = [r for r in train_probs.index if r not in ['531373215304339-1', '531373215305125-0', '531373215305125-1']]
@@ -22,7 +22,7 @@ def firstStage(train_TBs, test_TBs ,threshold, random_seed=42):
 
 def secondStage(train_ETs, test_ETs, threshold, random_seed=42):
     print('\nSecond Stage Starting...\n')
-    train_probs, test_probs = CV(train_twoBBdf=train_ETs, test_twoBBdf=test_ETs, nfolds=8, random_seed=random_seed, array_index=True)
+    train_probs, test_probs = CV(train_twoBBdf=train_ETs, test_twoBBdf=test_ETs, nfolds=2, random_seed=random_seed, array_index=True)
     train_probs = train_probs[train_probs>threshold] ; test_probs = test_probs[test_probs>threshold]
     print('\n\nSecond Stage Complete!!!\n\n')
     return train_probs, test_probs
@@ -52,8 +52,7 @@ def thirdStage(train_TAG_df, test_TAG_df,  train_TB_scores, test_TB_scores, trai
     train_TAG_df, train_event_ids, train_TAG_labels = preprocess(TAG_df=train_TAG_df, TB_scores=train_TB_scores, path=train_path)
     test_TAG_df, test_event_ids, test_TAG_labels = preprocess(TAG_df=test_TAG_df, TB_scores=test_TB_scores, path=test_path)
 
-    test_TAG_probs = CV(train_twoBBdf=train_TAG_df.drop(columns=ids + ['TB_id'], axis=0), test_twoBBdf=test_TAG_df.drop(columns=ids + ['TB_id'], axis=0)
-                    ,nfolds=8, random_seed=random_seed, justdf=True)
+    train_TAG_probs, test_TAG_probs = CV(train_twoBBdf=train_TAG_df.drop(columns=ids + ['TB_id'], axis=0), test_twoBBdf=test_TAG_df.drop(columns=ids + ['TB_id'], axis=0),nfolds=2, random_seed=random_seed, justdf=True)
 
     TAG_preds = pd.concat([test_TAG_probs, test_TB_scores, test_event_ids, test_TAG_labels.SignalB_ID], axis=1);
     TAG_preds.columns = ['TAG_scores', 'TB_scores', 'event_id', 'label']

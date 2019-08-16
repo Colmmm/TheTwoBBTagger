@@ -3,7 +3,8 @@ import pandas as pd
 from root_pandas import read_root
 from sklearn.metrics import accuracy_score
 from utils import score_combiner
-path = '../TaggingJpsiK2012_tiny_fix_fix.root'
+train_path = '../TaggingJpsiK2012_tiny_fix_fix.root'
+test_path = '../TaggingJpsiK2012_tiny_fix_fixSlice2.root'
 
 def firstStage(train_TBs, test_TBs ,threshold, random_seed=42):
     print('\nFirst Stage starting...\n\n')
@@ -26,8 +27,8 @@ def secondStage(train_ETs, test_ETs, threshold, random_seed=42):
     print('\n\nSecond Stage Complete!!!\n\n')
     return train_probs, test_probs
 
-def thirdStage(TAG_df, TB_scores, path=path, random_seed=42):
-    print('\n\nStarting Third Stage...\n\n')
+
+def preprocess(TAG_df, TB_scores, path):
     ids = ['runNumber', 'eventNumber', 'nCandidate']
     target = ['SignalB_ID']
     TAG_labels = read_root(paths=path, columns=ids + target)
@@ -41,10 +42,20 @@ def thirdStage(TAG_df, TB_scores, path=path, random_seed=42):
 
     TAG_df = pd.concat([TAG_df, TAG_labels], axis=1).loc[TB_scores.index]
 
-    TAG_probs = CV(twoBBdf=TAG_df.drop(columns=ids + ['TB_id'], axis=0), test_size=0.33, nfolds=8,
-                   random_seed=random_seed, justdf=True)
+    return TAG_df, event_ids, TAG_labels
 
-    TAG_preds = pd.concat([TAG_probs, TB_scores, event_ids, TAG_labels.SignalB_ID], axis=1);
+
+
+def thirdStage(train_TAG_df, test_TAG_df,  train_TB_scores, test_TB_scores, train_path=train_path, test_path=test_path, random_seed=42):
+    print('\n\nStarting Third Stage...\n\n')
+    ids = ['runNumber', 'eventNumber', 'nCandidate']
+    train_TAG_df, train_event_ids, train_TAG_labels = preprocess(TAG_df=train_TAG_df, TB_scores=train_TB_scores, path=train_path)
+    test_TAG_df, test_event_ids, test_TAG_labels = preprocess(TAG_df=test_TAG_df, TB_scores=test_TB_scores, path=test_path)
+
+    test_TAG_probs = CV(train_twoBBdf=train_TAG_df.drop(columns=ids + ['TB_id'], axis=0), test_twoBBdf=test_TAG_df.drop(columns=ids + ['TB_id'], axis=0),
+                   test_size=0.33, nfolds=8, random_seed=random_seed, justdf=True)
+
+    TAG_preds = pd.concat([test_TAG_probs, test_TB_scores, test_event_ids, test_TAG_labels.SignalB_ID], axis=1);
     TAG_preds.columns = ['TAG_scores', 'TB_scores', 'event_id', 'label']
     per_event_TAG = TAG_preds.groupby('event_id').apply(score_combiner)
     per_event_TAG = per_event_TAG.groupby('event_id').mean()
@@ -53,7 +64,7 @@ def thirdStage(TAG_df, TB_scores, path=path, random_seed=42):
 
     print('\n\nThird Stage Complete!!\n')
     acc = accuracy_score(per_event_TAG.label, round(per_event_TAG.pred)) ; print('\nThe final Tagging Accuracy:\n{0}'.format(acc))
-    tag_eff = 0.89*(per_event_TAG.shape[0]/1047) ; print('\nTagging efficiency:\n{0}'.format(tag_eff))
+    tag_eff = 0.89*(per_event_TAG.shape[0]/1114) ; print('\nTagging efficiency:\n{0}'.format(tag_eff))
     print('\nOVERALL TAGGING POWER:\n{0}'.format(  tag_eff*(1-2*(1-acc))**2)  )
 
     return per_event_TAG

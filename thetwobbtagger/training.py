@@ -101,7 +101,7 @@ def CV(train_twoBBdf, test_twoBBdf, nfolds=5, random_seed = 42, array_index=Fals
         if array_index==True:
             feats = [c for c in train_df.columns if c not in train_twoBBdf.label+train_twoBBdf.ids+ ['__array_index']]
         #we need to remove the id like columns/branches for training, as well as the label
-        feats = [c for c in df.columns if c not in train_twoBBdf.label+train_twoBBdf.ids]
+        feats = [c for c in train_df.columns if c not in train_twoBBdf.label+train_twoBBdf.ids]
         target = train_twoBBdf.label[0] #we have [0] as label is inputted as a list
 
     X_train = train_df[feats] ; y_train = train_df[target]
@@ -127,6 +127,7 @@ def CV(train_twoBBdf, test_twoBBdf, nfolds=5, random_seed = 42, array_index=Fals
         oof.iloc[cv_index] = model.predict_proba(X_train[cv_index])[:,1]
         preds += model.predict_proba((X_test))[:,1] / skf.n_splits
 
+    print(oof.shape, preds.shape)
     #calibrating the output of the ML algorithm
     print('\nCalibrating...\n')
     calib_function = prob_calibration_function(y_train, oof)

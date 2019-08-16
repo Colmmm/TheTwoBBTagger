@@ -52,8 +52,8 @@ def thirdStage(train_TAG_df, test_TAG_df,  train_TB_scores, test_TB_scores, trai
     train_TAG_df, train_event_ids, train_TAG_labels = preprocess(TAG_df=train_TAG_df, TB_scores=train_TB_scores, path=train_path)
     test_TAG_df, test_event_ids, test_TAG_labels = preprocess(TAG_df=test_TAG_df, TB_scores=test_TB_scores, path=test_path)
 
-    test_TAG_probs = CV(train_twoBBdf=train_TAG_df.drop(columns=ids + ['TB_id'], axis=0), test_twoBBdf=test_TAG_df.drop(columns=ids + ['TB_id'], axis=0),
-                   test_size=0.33, nfolds=8, random_seed=random_seed, justdf=True)
+    test_TAG_probs = CV(train_twoBBdf=train_TAG_df.drop(columns=ids + ['TB_id'], axis=0), test_twoBBdf=test_TAG_df.drop(columns=ids + ['TB_id'], axis=0)
+                    ,nfolds=8, random_seed=random_seed, justdf=True)
 
     TAG_preds = pd.concat([test_TAG_probs, test_TB_scores, test_event_ids, test_TAG_labels.SignalB_ID], axis=1);
     TAG_preds.columns = ['TAG_scores', 'TB_scores', 'event_id', 'label']

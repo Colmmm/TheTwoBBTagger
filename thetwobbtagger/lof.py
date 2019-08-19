@@ -152,7 +152,7 @@ def LOF(dfx):
 
     return flatten_vector_features(df=df_with_MM2_and_Etracks, vector_features=vector_features)
 
-def combine(TB_COM_df, ET_COM_df):
+def combine(TB_COM_df, ET_COM_df, max_ETs = 4):
     # I need to add a TB_index column to extra tracks df so I can merge them later
     TB_COM_df['TB_id'] =  TB_COM_df.apply(lambda x: str(int(x.runNumber)) + str(int(x.eventNumber))+'-'+str(int(x.nCandidate)), axis=1)
     ET_COM_df['TB_id'] = ET_COM_df.apply(lambda x: str(int(x.runNumber)) + str(int(x.eventNumber)) + '-' + str(int(x.nCandidate)), axis=1)
@@ -160,7 +160,7 @@ def combine(TB_COM_df, ET_COM_df):
     count = 0
     # defining the extra tracks that need to be added, and looping over until theres none left
     need_adding = ET_COM_df
-    while len(need_adding) != 0:
+    while len(need_adding) != 0 and count <= max_ETs:
 
         # defining the track ids that will be added to the TB_df next
         being_added = need_adding['TB_id'].drop_duplicates().index.to_list()

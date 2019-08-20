@@ -22,27 +22,15 @@ def chunk_processing(chunk_df):
     return chunk_df
 
 
-class graph_df(twoBBdf):
+class graph_df():
 
-    def generateData4graphes(self, chunk_size=250000):
-        df_generator = read_root(paths=path, columns=self.ids+self.feats4LOF, chunksize=chunk_size)
-
-        whole_df = pd.DataFrame()
-
-        for chunk_df in tqdm(df_generator, unit='chunks'):
-            chunk_df = chunk_processing(chunk_df)
-            whole_df = pd.concat([whole_df, chunk_df])
-            del chunk_df
-            gc.collect()
-            print(whole_df.shape[0])
-
-        whole_df.to_csv('data4lofPLOTS.csv')
-
-        return whole_df
+    def __init__(self, path, dict, chunk_size=25000):
+        self = twoBBdf(path = path, dict = dict)
+        self.generator = read_root(paths=self.path, columns=self.ids+self.feats4LOF+self.label, chunksize=chunk_size)
 
 
 def main():
-    graphDF = graph_df(path = path, dict = GRAPHS1_DICT)
+    graphDF = twoBBdf(path = path, dict = GRAPHS1_DICT, chunk_size=5000)
     LOF(graphDF, generator=True)
 
 

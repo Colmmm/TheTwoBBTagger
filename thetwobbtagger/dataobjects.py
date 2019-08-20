@@ -22,7 +22,7 @@ import pandas as pd
 from root_pandas import read_root
 
 class twoBBdf:
-    def __init__(self, path, dict, specific_TBs=pd.Series(), specific_ETs=pd.Series()):
+    def __init__(self, path, dict, specific_TBs=pd.Series(), specific_ETs=pd.Series(), chunk_size=None):
         #the attributes below refer to the different kind of column/branch names stored in the name dictionary
         self.path =path
         self.ids = dict['ids']
@@ -34,6 +34,8 @@ class twoBBdf:
         #the specific_XXs attributes is for when you only want to read in specific TBs or ETs, filtered by their ids which is inputed as a panda series
         self.specific_TBs = specific_TBs
         self.specific_ETs = specific_ETs
+        if chunk_size !=None:
+            self.generator = read_root(paths=self.path, columns=self.ids + self.feats4LOF + self.label,chunksize=chunk_size)
         if self.label == ['TwoBody_FromSameB']:
             #this index_function is used to create the index, ie TB index for TBs and ET index for ETs
             self.index_function = lambda x: str(int(x.runNumber)) + str(int(x.eventNumber))+'-'+str(int(x.nCandidate))

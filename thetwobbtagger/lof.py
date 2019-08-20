@@ -6,6 +6,7 @@ import pandas as pd
 from fnmatch import filter
 from numpy import array
 from math import sqrt, atan2, cos, sin, acos, degrees, log, pi, sinh
+from tqdm import tqdm
 
 def perp(v):
     """defining a function to find the perpendicular vector to our flight vector"""
@@ -95,7 +96,6 @@ def flatten_vector_features(df, vector_features):
 def MM2_calculator(df, B_M_nominal=5279.5):
     """Main function to calculate COM values, input is df, and output is same
     df but with added columns for the COM values"""
-
     # set up flight related vectors
     df['pv_vector'] = df.apply(lambda x: array([x.TwoBody_OWNPV_X, x.TwoBody_OWNPV_Y, x.TwoBody_OWNPV_Z]), axis=1)
     df['sv_vector'] = df.apply(lambda x: array([x.TwoBody_ENDVERTEX_X, x.TwoBody_ENDVERTEX_Y, x.TwoBody_ENDVERTEX_Z]),
@@ -156,12 +156,13 @@ def LOF(dfx, generator=False):
     if generator==True:
         whole_df = pd.DataFrame()
         for chunk_df in tqdm(dfx.generator, unit='chunks'):
-            chunk_df = chunk_processing(chunk_df)
-            df_with_MM2 = MM2_calculator(chunk_df)
+
+            chunk_df = MM2_calculator(chunk_df)
             # this allows you to select what Etrack caluclations you do, ie, just for Track1/Track2, or just for the extra tracks or all at same time
             for i in range(len(dfx.tracknames4LOF)):
-                df_with_MM2_and_Etracks = Etrack_calculator(df_with_MM2, three_momentum=dfx.threemomentum4LOF[i],probs=dfx.probs4LOF[i], name=dfx.tracknames4LOF[i])
-            whole_df = pd.concat([whole_df, df_with_MM2_and_Etracks ])
+                chunk_df = Etrack_calculator(chunk_df, three_momentum=dfx.threemomentum4LOF[i],probs=dfx.probs4LOF[i], name=dfx.tracknames4LOF[i])
+            chunk_df = chunk_processing(chunk_df)
+            whole_df = pd.concat([whole_df, chunk_df ])
         whole_df.to_csv('data4lofPLOTS.csv')
         return whole_df
     else:

@@ -139,11 +139,14 @@ def Etrack_calculator(df, three_momentum, probs, name):
     return df
 
 
-def LOF(dfx):
+def LOF(dfx, just_df=False):
     """This is the main function which calculates the COM variables"""
 
-    #this adds the missing mass variables to the df
-    df_with_MM2 = MM2_calculator(dfx.get_LOFdf())
+    if just_df==True:
+        df_with_MM2 = MM2_calculator(dfx)
+    else:
+        #this adds the missing mass variables to the df
+        df_with_MM2 = MM2_calculator(dfx.get_LOFdf())
 
     #this allows you to select what Etrack caluclations you do, ie, just for Track1/Track2, or just for the extra tracks or all at same time
     for i in range(len(dfx.tracknames4LOF)):

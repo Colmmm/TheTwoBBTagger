@@ -290,3 +290,59 @@ TAG_dict = {'ids': [
 
     'flatLOF_key': []
 }
+
+
+GRAPHS1_DICT = {
+    'ids': [
+    'runNumber'
+    ,'eventNumber'
+    ,'nCandidate'],
+
+    'MVA_key': [],
+
+    'flatMVA_key': [],
+
+    'label_key':[
+    'TwoBody_FromSameB'],
+
+    'flatLOF_key': [],
+
+    'LOF_key': [
+    "TwoBody_M",
+    "TwoBody_PE",
+    "TwoBody_PX",
+    "TwoBody_PY",
+    "TwoBody_PZ",
+    "TwoBody_ENDVERTEX_X",
+    "TwoBody_ENDVERTEX_Y",
+    "TwoBody_ENDVERTEX_Z",
+    "TwoBody_OWNPV_X",
+    "TwoBody_OWNPV_Y",
+    "TwoBody_OWNPV_Z",
+    "Track1_PX",
+    "Track1_PY",
+    "Track1_PZ",
+    "Track2_PX",
+    "Track2_PY",
+    "Track2_PZ",
+    'Track1_ProbNNe',
+    'Track1_ProbNNk',
+    'Track1_ProbNNp',
+    'Track1_ProbNNpi',
+    'Track1_ProbNNmu',
+    'Track1_ProbNNghost',
+    'Track2_ProbNNe',
+    'Track2_ProbNNk',
+    'Track2_ProbNNp',
+    'Track2_ProbNNpi',
+    'Track2_ProbNNmu',
+    'Track2_ProbNNghost',
+    'Track1_Charge',
+    'Track2_Charge',
+    'Track1_TrueKaon',
+    'Track1_TrueMuon',
+    'Track2_TrueMuon',
+    'Track2_TrueKaon',
+    'SignalB_ID']
+
+}

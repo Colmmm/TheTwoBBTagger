@@ -7,6 +7,7 @@ from names_dict import GRAPHS1_DICT
 import gc ; gc.enable()
 from matplotlib import pyplot as plt
 import seaborn as sns
+import time
 
 path = '../TaggingJpsiK2012_tiny_fix_fix.root'
 
@@ -32,6 +33,7 @@ class graph_df():
 
 
 def main():
+    start_time = time.time()
     graphDF = twoBBdf(path = path, dict = GRAPHS1_DICT, chunk_size=5000)
     df4analysis = LOF(graphDF, generator=True)
     plt.figure(figsize=(16, 10))

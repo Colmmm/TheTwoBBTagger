@@ -7,6 +7,7 @@ from fnmatch import filter
 from numpy import array
 from math import sqrt, atan2, cos, sin, acos, degrees, log, pi, sinh
 from tqdm import tqdm
+import gc ; gc.enable()
 
 def perp(v):
     """defining a function to find the perpendicular vector to our flight vector"""
@@ -174,6 +175,7 @@ def LOF(dfx, generator=False):
                 chunk_df = Etrack_calculator(chunk_df, three_momentum=dfx.threemomentum4LOF[i],probs=dfx.probs4LOF[i], name=dfx.tracknames4LOF[i])
             chunk_df = chunk_processing(chunk_df)
             whole_df = pd.concat([whole_df, chunk_df ])
+            del chunk_df ; gc.collect()
         whole_df.to_csv('data4lofPLOTS.csv')
         return whole_df
     else:

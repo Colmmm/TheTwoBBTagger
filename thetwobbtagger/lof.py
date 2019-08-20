@@ -139,11 +139,31 @@ def Etrack_calculator(df, three_momentum, probs, name):
     return df
 
 
-def LOF(dfx, just_df=False):
+cols2keep = ['SignalB_ID' , 'Track1_TrueMuon', 'Track2_TrueKaon', 'Track1_TrueKaon','Track2_TrueMuon',
+             'Etrack1', 'Etrack2', 'Track1_Charge', 'Track2_Charge' ]
+
+def chunk_processing(chunk_df):
+    chunk_df.index = chunk_df.apply(lambda x: str(int(x.runNumber)) + str(int(x.eventNumber)) + '-' + str(int(x.nCandidate)), axis=1)
+    chunk_df = chunk_df.query('TwoBody_FromSameB==1')
+    chunk_df = chunk_df.loc[:, cols2keep]
+    chunk_df['Track1_Charge*SignalB_ID'] = chunk_df.apply(lambda x: x.Track1_Charge * x.SignalB_ID, axis=1)
+    chunk_df['Track2_Charge*SignalB_ID'] = chunk_df.apply(lambda x: x.Track2_Charge * x.SignalB_ID, axis=1)
+    return chunk_df
+
+def LOF(dfx, generator=False):
     """This is the main function which calculates the COM variables"""
 
-    if just_df==True:
-        df_with_MM2 = MM2_calculator(dfx)
+    if generator==True:
+        whole_df = pd.DataFrame()
+        for chunk_df in tqdm(dfx.generator, unit='chunks'):
+            chunk_df = chunk_processing(chunk_df)
+            df_with_MM2 = MM2_calculator(chunk_df)
+            # this allows you to select what Etrack caluclations you do, ie, just for Track1/Track2, or just for the extra tracks or all at same time
+            for i in range(len(dfx.tracknames4LOF)):
+                df_with_MM2_and_Etracks = Etrack_calculator(df_with_MM2, three_momentum=dfx.threemomentum4LOF[i],probs=dfx.probs4LOF[i], name=dfx.tracknames4LOF[i])
+            whole_df = pd.concat([whole_df, df_with_MM2_and_Etracks ])
+        whole_df.to_csv('data4lofPLOTS.csv')
+        return whole_df
     else:
         #this adds the missing mass variables to the df
         df_with_MM2 = MM2_calculator(dfx.get_LOFdf())

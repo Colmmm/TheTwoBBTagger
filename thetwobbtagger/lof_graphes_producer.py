@@ -43,7 +43,7 @@ class graph_df(twoBBdf):
 
 def main():
     graphDF = graph_df(path = path, dict = GRAPHS1_DICT)
-    graphDF.generateData4graphes()
+    LOF(graphDF, generator=True)
 
 
 if __name__ == '__main__':

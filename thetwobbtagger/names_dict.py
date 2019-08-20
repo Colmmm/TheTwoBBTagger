@@ -339,10 +339,19 @@ GRAPHS1_DICT = {
     'Track2_ProbNNghost',
     'Track1_Charge',
     'Track2_Charge',
+
+    'Track1_TrueElectron',
     'Track1_TrueKaon',
     'Track1_TrueMuon',
-    'Track2_TrueMuon',
+    'Track1_TruePion',
+    'Track1_TrueProton',
+
+    'Track2_TrueElectron',
     'Track2_TrueKaon',
+    'Track2_TrueMuon',
+    'Track2_TruePion',
+    'Track2_TrueProton',
+
     'SignalB_ID']
 
 }

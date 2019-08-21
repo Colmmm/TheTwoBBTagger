@@ -176,7 +176,6 @@ def LOF(dfx, generator=False):
             chunk_df = chunk_processing(chunk_df)
             whole_df = pd.concat([whole_df, chunk_df ])
             del chunk_df ; gc.collect()
-        whole_df.to_csv('data4lofPLOTS.csv')
         return whole_df
     else:
         #this adds the missing mass variables to the df

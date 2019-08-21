@@ -354,4 +354,6 @@ GRAPHS1_DICT = {
 
     'SignalB_ID']
 
-}
+},
+
+GRAPHES2_DICT = {}

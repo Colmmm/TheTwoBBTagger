@@ -25,17 +25,13 @@ def chunk_processing(chunk_df):
     return chunk_df
 
 
-class graph_df():
-
-    def __init__(self, path, dict, chunk_size=25000):
-        self = twoBBdf(path = path, dict = dict)
-        self.generator = read_root(paths=self.path, columns=self.ids+self.feats4LOF+self.label, chunksize=chunk_size)
-
-
 def main():
     start_time = time.time()
     graphDF = twoBBdf(path = path, dict = GRAPHS1_DICT, chunk_size=5000)
     df4analysis = LOF(graphDF, generator=True)
+    df4analysis.to_csv('data4_lof_PLOTS.csv')
+    df4analysis = df4analysis.query('Etrack1<8000')
+
     plt.figure(figsize=(16, 10))
 
     plt.subplot(2, 3, 1)
@@ -77,8 +73,8 @@ def main():
     data = df4analysis.query('Track2_TrueKaon==1')
     dist1 = data.query('Track2_Charge*SignalB_ID == 521.0').Etrack1
     dist2 = data.query('Track2_Charge*SignalB_ID == -521.0').Etrack1
-    sns.distplot(dist1, color="black", label='Track1_Charge*SignalB_ID = 521.0', bins=50)
-    sns.distplot(dist2, color="purple", label='Track1_Charge*SignalB_ID = -521.0', bins=120)
+    sns.distplot(dist1, color="black", label='Track1_Charge*SignalB_ID = 521.0')
+    sns.distplot(dist2, color="purple", label='Track1_Charge*SignalB_ID = -521.0')
     plt.legend()
     print(data.shape)
 
@@ -88,8 +84,8 @@ def main():
     data = df4analysis.query('Track2_TrueProton==1')
     dist1 = data.query('Track2_Charge*SignalB_ID == 521.0').Etrack1
     dist2 = data.query('Track2_Charge*SignalB_ID == -521.0').Etrack1
-    sns.distplot(dist1, color="black", label='Track1_Charge*SignalB_ID = 521.0', bins=50)
-    sns.distplot(dist2, color="purple", label='Track1_Charge*SignalB_ID = -521.0', bins=120)
+    sns.distplot(dist1, color="black", label='Track1_Charge*SignalB_ID = 521.0')
+    sns.distplot(dist2, color="purple", label='Track1_Charge*SignalB_ID = -521.0')
     plt.legend()
     print(data.shape)
 

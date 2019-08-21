@@ -35,7 +35,7 @@ class twoBBdf:
         self.specific_TBs = specific_TBs
         self.specific_ETs = specific_ETs
         if chunk_size !=None:
-            self.generator = read_root(paths=self.path, columns=self.ids + self.feats4LOF + self.label,chunksize=chunk_size)
+            self.generator = read_root(paths=self.path, columns=self.ids + self.feats4LOF + self.label,chunksize=chunk_size, flatten=self.flatfeats4LOF)
         if self.label == ['TwoBody_FromSameB']:
             #this index_function is used to create the index, ie TB index for TBs and ET index for ETs
             self.index_function = lambda x: str(int(x.runNumber)) + str(int(x.eventNumber))+'-'+str(int(x.nCandidate))

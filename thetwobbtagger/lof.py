@@ -140,26 +140,14 @@ def Etrack_calculator(df, three_momentum, probs, name):
     return df
 
 
-cols2keep = ['SignalB_ID' ,'Etrack1', 'Etrack2', 'Track1_Charge', 'Track2_Charge',
-             'Track1_TrueElectron',
-             'Track1_TrueKaon',
-             'Track1_TrueMuon',
-             'Track1_TruePion',
-             'Track1_TrueProton',
+cols2keep = ['SignalB_ID' , 'TwoBody_Extra_CHARGE', 'Eextra_track', 'TwoBody_Extra_TRUEPID']
 
-             'Track2_TrueElectron',
-             'Track2_TrueKaon',
-             'Track2_TrueMuon',
-             'Track2_TruePion',
-             'Track2_TrueProton'
-             ]
 
 def chunk_processing(chunk_df):
     chunk_df.index = chunk_df.apply(lambda x: str(int(x.runNumber)) + str(int(x.eventNumber)) + '-' + str(int(x.nCandidate)), axis=1)
     chunk_df = chunk_df.query('TwoBody_FromSameB==1')
     chunk_df = chunk_df.loc[:, cols2keep]
-    chunk_df['Track1_Charge*SignalB_ID'] = chunk_df.apply(lambda x: x.Track1_Charge * x.SignalB_ID, axis=1)
-    chunk_df['Track2_Charge*SignalB_ID'] = chunk_df.apply(lambda x: x.Track2_Charge * x.SignalB_ID, axis=1)
+    chunk_df['TwoBody_Extra_CHARGE*SignalB_ID'] = chunk_df.apply(lambda x: x.TwoBody_Extra_CHARGE * x.SignalB_ID, axis=1)
     return chunk_df
 
 def LOF(dfx, generator=False):

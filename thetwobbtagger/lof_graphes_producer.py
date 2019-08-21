@@ -12,19 +12,6 @@ import time
 path = '../TaggingJpsiK2012_tiny_fix_fix.root'
 
 
-cols2keep = ['SignalB_ID' , 'Track1_TrueMuon', 'Track2_TrueKaon', 'Track1_TrueKaon','Track2_TrueMuon',
-             'Etrack1', 'Etrack2', 'Track1_Charge', 'Track2_Charge' ]
-
-def chunk_processing(chunk_df):
-    chunk_df.index = chunk_df.apply(lambda x: str(int(x.runNumber)) + str(int(x.eventNumber)) + '-' + str(int(x.nCandidate)), axis=1)
-    chunk_df = chunk_df.query('TwoBody_FromSameB==1')
-    chunk_df = LOF(chunk_df)
-    chunk_df = chunk_df.loc[:, cols2keep]
-    chunk_df['Track1_Charge*SignalB_ID'] = chunk_df.apply(lambda x: x.Track1_Charge * x.SignalB_ID, axis=1)
-    chunk_df['Track2_Charge*SignalB_ID'] = chunk_df.apply(lambda x: x.Track2_Charge * x.SignalB_ID, axis=1)
-    return chunk_df
-
-
 def main():
     start_time = time.time()
     graphDF = twoBBdf(path = path, dict = GRAPHS1_DICT, chunk_size=5000)

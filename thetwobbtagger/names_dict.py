@@ -354,6 +354,59 @@ GRAPHS1_DICT = {
 
     'SignalB_ID']
 
-},
+}
 
-GRAPHES2_DICT = {}
+GRAPHS2_DICT = {
+    'ids': [
+    'runNumber'
+    ,'eventNumber'
+    ,'nCandidate'],
+
+    'MVA_key':[],
+
+    'flatMVA_key':[],
+
+    'label_key': [
+    'TwoBody_Extra_FromSameB'],
+
+    'LOF_key':[
+    "TwoBody_M",
+    "TwoBody_PE",
+    "TwoBody_PX",
+    "TwoBody_PY",
+    "TwoBody_PZ",
+    "TwoBody_ENDVERTEX_X",
+    "TwoBody_ENDVERTEX_Y",
+    "TwoBody_ENDVERTEX_Z",
+    "TwoBody_OWNPV_X",
+    "TwoBody_OWNPV_Y",
+    "TwoBody_OWNPV_Z",
+    'TwoBody_Extra_Px',
+    'TwoBody_Extra_Py',
+    'TwoBody_Extra_Pz',
+    'TwoBody_Extra_TRUEPID',
+    'TwoBody_Extra_FromSameB',
+    'TwoBody_Extra_CHARGE',
+    'TwoBody_Extra_NNp',
+    'TwoBody_Extra_NNk',
+    'TwoBody_Extra_NNpi',
+    'TwoBody_Extra_NNmu',
+    'TwoBody_Extra_NNe',
+    'TwoBody_Extra_NNg',
+    'SignalB_ID',
+    'TwoBody_FromSameB'],
+
+    'flatLOF_key': [
+    'TwoBody_Extra_Px',
+    'TwoBody_Extra_Py',
+    'TwoBody_Extra_Pz',
+    'TwoBody_Extra_TRUEPID',
+    'TwoBody_Extra_FromSameB',
+    'TwoBody_Extra_CHARGE',
+    'TwoBody_Extra_NNp',
+    'TwoBody_Extra_NNk',
+    'TwoBody_Extra_NNpi',
+    'TwoBody_Extra_NNmu',
+    'TwoBody_Extra_NNe',
+    'TwoBody_Extra_NNg']
+}

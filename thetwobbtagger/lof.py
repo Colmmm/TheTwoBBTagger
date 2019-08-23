@@ -145,7 +145,7 @@ cols2keep = ['SignalB_ID' , 'TwoBody_Extra_CHARGE', 'Eextra_track', 'TwoBody_Ext
 
 def chunk_processing(chunk_df):
     chunk_df.index = chunk_df.apply(lambda x: str(int(x.runNumber)) + str(int(x.eventNumber)) + '-' + str(int(x.nCandidate)), axis=1)
-    chunk_df = chunk_df.query('TwoBody_FromSameB==1')
+    chunk_df = chunk_df.query('TwoBody_FromSameB==1 & TwoBody_Extra_FromSameB==1')
     chunk_df = chunk_df.loc[:, cols2keep]
     chunk_df['TwoBody_Extra_CHARGE*SignalB_ID'] = chunk_df.apply(lambda x: x.TwoBody_Extra_CHARGE * x.SignalB_ID, axis=1)
     return chunk_df

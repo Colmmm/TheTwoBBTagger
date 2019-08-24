@@ -163,6 +163,7 @@ def LOF(dfx, generator=False):
                 chunk_df = Etrack_calculator(chunk_df, three_momentum=dfx.threemomentum4LOF[i],probs=dfx.probs4LOF[i], name=dfx.tracknames4LOF[i])
             chunk_df = chunk_processing(chunk_df)
             whole_df = pd.concat([whole_df, chunk_df ])
+            whole_df.to_csv('ETs_PLOT4lof_data_onSAT.csv')
             del chunk_df ; gc.collect()
         return whole_df
     else:

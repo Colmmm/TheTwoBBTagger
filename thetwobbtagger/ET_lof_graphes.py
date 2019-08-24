@@ -16,7 +16,7 @@ def main():
     start_time = time.time()
     graphDF = twoBBdf(path = path, dict = GRAPHS2_DICT, chunk_size=5000)
     df4analysis = LOF(graphDF, generator=True)
-    df4analysis.to_csv('ETs_PLOT4lof_data.csv')
+    df4analysis.to_csv('ETs_PLOT4lof_data_onSAT.csv')
     df4analysis = df4analysis.query('Eextra_track<8000')
 
     plt.figure(figsize=(16, 10))

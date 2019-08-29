@@ -1,3 +1,5 @@
+""""""
+
 import numpy as np
 from skhep.math.vectors import Vector3D, LorentzVector
 import pandas as pd
@@ -138,7 +140,8 @@ def Etrack_calculator(df, three_momentum, probs, name):
 
 
 def LOF(dfx):
-    """"""
+    """This is the main function which calculates the COM variables"""
+
     #this adds the missing mass variables to the df
     df_with_MM2 = MM2_calculator(dfx.get_LOFdf())
 
@@ -153,6 +156,11 @@ def LOF(dfx):
     return flatten_vector_features(df=df_with_MM2_and_Etracks, vector_features=vector_features)
 
 def combine(TB_COM_df, ET_COM_df):
+    """"This function combines the TB_COM_df and the ET_COM_df together and works as the following:
+        1) Get rid TB vertex duplicates, ie, so we only have one extra track per TB (call this dfA)
+        2) Take note of what Extra tracks were kept in step 1), and remove them via their extra track index
+        3) Change index of dfA to be a TB_index (currently has ET index) and merge dfA with TB_df"""
+
     # I need to add a TB_index column to extra tracks df so I can merge them later
     TB_COM_df['TB_id'] =  TB_COM_df.apply(lambda x: str(int(x.runNumber)) + str(int(x.eventNumber))+'-'+str(int(x.nCandidate)), axis=1)
     ET_COM_df['TB_id'] = ET_COM_df.apply(lambda x: str(int(x.runNumber)) + str(int(x.eventNumber)) + '-' + str(int(x.nCandidate)), axis=1)

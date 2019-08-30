@@ -1,7 +1,7 @@
 """This python script contains all the 'stage' functions which make up the majority of the 2B^2 tagging pipeline. Each
    stage has an instance of machine learning (ML or MVA) and can be summarised as the following:
-   1) FirstStage is all about TwoBodys (TBs) and uses an MVA to filter the ones that don't belong to decay of tagging B
-   2) SecondStage is all ExtraTracks (ETs) and uses an MVA to filter the ones that don't belong to decay of tagging B
+   1) FirstStage is all about TwoBodys (TBs) and uses an MVA to filter the ones that don't belong to decay of the tagging B
+   2) SecondStage is all ExtraTracks (ETs) and uses an MVA to filter the ones that don't belong to decay of the tagging B
    3) ThirdStage is all about the whole events themselves and using an MVA to predict the tag of signal B (but in reality
       we perform MVA on TBs and then combine the result of the TBs which are present in any given event)
 """

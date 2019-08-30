@@ -1,3 +1,15 @@
+"""These are the name dictionaries which need to be passed when initiating a twoBBdf object to specify what kind of
+   branches/features are needed for each process. The keys represent the different type of processes which go on and
+    include:
+    1) ids
+    2) MVA_key
+    3) flatMVA_key
+    4) label_key
+    5) LOF_key
+    6) flatLOF_key
+    The ids key needs to be specified for both the TB and ET instances, but something like the flatMVA_key can be defined
+    as an empty list as there's no features/branches that need to be flattened when doing the TB MVA.
+"""
 TB_dict={
     'ids': [
     'runNumber'

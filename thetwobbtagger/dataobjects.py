@@ -17,7 +17,6 @@
     we only have to input this data object. The rest of the attributes are there mostly then to cover the subtle
     differences between data structures of the TBs and ETs.
 """
-
 import pandas as pd
 from root_pandas import read_root
 

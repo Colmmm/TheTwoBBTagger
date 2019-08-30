@@ -1,5 +1,6 @@
-""""""
-
+"""This python file contains all the necessary functions to calculate the Centre of Mass (COM) quantities using the
+   Line of Flight (LOF) technique.
+"""
 import numpy as np
 from skhep.math.vectors import Vector3D, LorentzVector
 import pandas as pd
@@ -27,8 +28,6 @@ def eta(Vector3D):
         else:
             return 10E10 if Vector3D.z > 0 else -10E10
 
-
-
 def my_SetPtEtaPhiM(pt, eta, phi, m):
     """ Create a Lorentz 4-momentum vector defined from the transverse momentum, the pseudorapidity,
     the angle phi and the mass."""
@@ -49,7 +48,6 @@ def boostvector(self):
     """Return the spatial component divided by the time component."""
     return Vector3D(self.x / self.t, self.y / self.t, self.z / self.t)
 
-
 def setpxpypzm(px, py, pz, m):
     """Creates a Lorentz four momentum vector using the 3momentum and mass as inputs. I have to define this myself
     rather than use function in the skhep library as that one doesnt output the four vector but updates the
@@ -64,7 +62,6 @@ def setpxpypzm(px, py, pz, m):
         self.t = sqrt(px ** 2 + py ** 2 + pz ** 2 - m ** 2)
 
     return self
-
 
 def track_four_momentum(x, three_momentum_labels, PID_labels):
     """This function calculates the lorentz four momentum of a given track. It uses the PID information (which are
@@ -90,7 +87,6 @@ def flatten_vector_features(df, vector_features):
     vector_free_cols = [c for c in df.columns if c not in vector_features]
     flatten_vector_df = pd.concat([df[vector_free_cols], vector_df], axis=1)
     return flatten_vector_df
-
 
 def MM2_calculator(df, B_M_nominal=5279.5):
     """Main function to calculate COM values, input is df, and output is same

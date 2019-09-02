@@ -1,19 +1,3 @@
-""" This is the function which deals with the training and evaluation of the ML algorithms, and is currently the same
-    for the MVA in the firstStage (TBs), the secondStage (ETs) and the thirdStage (TAGs), will create specific more
-    tailored functions for each stage later. For both the first and second Stages, the CV function takes in the data
-    class object twoBBdf, then using the attributes of the twoBBdf object, the data is split up into X (columns holding
-    the features) and y (the column holding the label/target).
-
-    The data is then split into a 2:1 train test split (based on default settings governed by the test_size parameter.
-    Then the model is trained by a nfold cross fold validation and predicted on the training data it was trained on
-    (Out Of Fold, oof) and also predicted on the 33% of test data which the model has not seen (preds).
-
-    The results on the training and test data are evaluated and should have roughly the same performance, otherwise, it
-    shows signs of overfitting.
-
-    The predictions by the ML algorithm (in this case its LightGBM) are calibrated into probabilities. These probabilities
-    along with the corresponding event/TB/ET id are outputted as a panda series
-"""
 from lightgbm import LGBMClassifier
 from sklearn.model_selection import KFold, train_test_split
 import pandas as pd

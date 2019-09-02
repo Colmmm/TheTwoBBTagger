@@ -1,22 +1,3 @@
-""" This is the main data object to describe the TwoBodies (TBs) and the ExtraTracks (Ets).
-
-    The Object class works on 2 main inputs, the root df containing all the data, and a names dictionary which contains
-    the names of the branches/columns needed for each type of process/procedure.
-
-    The Object class works by only creating a df when its called upon by one of the methods, for example, when you want
-    to apply the MVA to the TBs in the firstStage, you first initialise an instance of the object with the path to the
-    data (same for both TBs and ETs) and the specific TB_dict (unique for TBs), then applying the get_MVAdf, the object
-    looks up in the dictionary the columns/branches to call from the rootdf and outputs it.
-
-    The reason why a single object class was created for both the TBs and ETs was because they shared
-    lots of similar properties and processes, for example, both TBs and ETs need to be put through MVA to filter
-    out the bad TBs/ETs, they both also have to have their COM variables calculated via the Line of FLight technique.
-
-    Most of the objects attributes include the elements of the dictionary, which means that the object has all the info
-    it needs to reconstruct the df4MVA or df4LOF by itself which just means that we dont have to have any extra variables,
-    we only have to input this data object. The rest of the attributes are there mostly then to cover the subtle
-    differences between data structures of the TBs and ETs.
-"""
 import pandas as pd
 from root_pandas import read_root
 

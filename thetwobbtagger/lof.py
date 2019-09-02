@@ -1,6 +1,3 @@
-"""This python file contains all the necessary functions to calculate the Centre of Mass (COM) quantities using the
-   Line of Flight (LOF) technique.
-"""
 import numpy as np
 from skhep.math.vectors import Vector3D, LorentzVector
 import pandas as pd

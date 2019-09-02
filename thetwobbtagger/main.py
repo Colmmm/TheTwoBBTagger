@@ -1,9 +1,3 @@
-"""This is the main python script which brings the whole pipeline together. The general outline is as follows
-    1) Initialise TBs and then filter them (LHCb topologoical trigger MVA)
-    2) Initialise ETs and then filter them (Isolation MVA)
-    2.5) Combine TBs and ETs and apply LOF calculation
-    3) Feed TBs+ETs+LOF into tagger which then predicts a final output tag
-"""
 from dataobjects import twoBBdf
 from stages import firstStage, secondStage, thirdStage
 from lof import LOF, combine

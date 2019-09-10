@@ -148,7 +148,7 @@ def LOF(dfx):
 
     return flatten_vector_features(df=df_with_MM2_and_Etracks, vector_features=vector_features)
 
-def combine(TB_COM_df, ET_COM_df):
+def combine(TB_COM_df, ET_COM_df, max_ETs=2):
     """"This function combines the TB_COM_df and the ET_COM_df together and works as the following:
         1) Get rid TB vertex duplicates, ie, so we only have one extra track per TB (call this dfA)
         2) Take note of what Extra tracks were kept in step 1), and remove them via their extra track index
@@ -161,7 +161,7 @@ def combine(TB_COM_df, ET_COM_df):
     count = 0
     # defining the extra tracks that need to be added, and looping over until theres none left
     need_adding = ET_COM_df
-    while len(need_adding) != 0:
+    while len(need_adding) != 0 and count<=max_ETs:
 
         # defining the track ids that will be added to the TB_df next
         being_added = need_adding['TB_id'].drop_duplicates().index.to_list()
@@ -172,10 +172,10 @@ def combine(TB_COM_df, ET_COM_df):
         # initialising df to be merged with COM_TB_df, also getting rid of pointless features such as those already in TB df
         feats = [feat for feat in ET_COM_df.columns if feat not in TB_COM_df.columns + ['__array_index']] + ['TB_id']
         being_added_df = ET_COM_df.loc[being_added, feats]
-
+        print(being_added_df.columns)
         # need to change index of being_added_df so it can be merged with the TB_df
         being_added_df.index = being_added_df['TB_id']
-        being_added_df = being_added_df.drop(columns=(['TB_id', 'TwoBody_Extra_TRUEPID', 'TwoBody_Extra_FromSameB']))
+        being_added_df = being_added_df.drop(columns=(['TB_id']))
         # we also need to change names of the being_added_df columns as we will be adding more than one
         being_added_df.columns = [name + '_' + str(count) for name in being_added_df.columns]
         # time to merge the being_added_df to the TB_df

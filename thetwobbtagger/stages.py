@@ -2,7 +2,7 @@ from training import CV
 import pandas as pd
 from sklearn.metrics import accuracy_score
 from utils import score_combiner, preprocess4TAGGING
-train_path = '../TaggingJpsiK2012_tiny_fix_fix.root'
+train_path = '../TaggingJpsiK2012_fix_fix_5.root'
 test_path = '../TaggingJpsiK2012_tiny_fix_fixSlice2.root'
 
 def firstStage(train_TBs, test_TBs ,threshold, random_seed=42):
@@ -16,11 +16,8 @@ def firstStage(train_TBs, test_TBs ,threshold, random_seed=42):
     train_probs = train_probs[train_probs>threshold] ; test_probs = test_probs[test_probs>threshold]
 
     #at the moment, second stage cant deal with TBs without ETs, so I just get rid of the TBs without ETs for now
-    TB_w_ETs = [r for r in train_probs.index if r not in ['531373215304339-1', '531373215305125-0', '531373215305125-1']]
-    train_probs = train_probs.loc[TB_w_ETs]
-
-    TB_w_ETs = [r for r in test_probs.index if r not in ['5756867770067-1']]
-    test_probs = test_probs.loc[TB_w_ETs]
+    train_probs = train_probs.loc[train_TBs.get_MVAdf().query('TwoBody_n_Extra!=0').index]
+    test_probs = test_probs.loc[test_TBs.get_MVAdf().query('TwoBody_n_Extra!=0').index]
 
     print('\n\nFirst Stage Complete!!!\n\n')
     return train_probs, test_probs

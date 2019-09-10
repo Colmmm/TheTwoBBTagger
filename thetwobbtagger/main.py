@@ -2,7 +2,7 @@ from dataobjects import twoBBdf
 from stages import firstStage, secondStage, thirdStage
 from lof import LOF, combine
 from names_dict import TB_dict, ET_dict
-train_path = '../TaggingJpsiK2012_tiny_fix_fix.root'
+train_path = '../TaggingJpsiK2012_fix_fix_5.root.root'
 test_path = '../TaggingJpsiK2012_tiny_fix_fixSlice2.root'
 
 def main():
@@ -18,8 +18,8 @@ def main():
     trainETs.specific_ETs = trainpromisingETs.index ; testETs.specific_ETs = testpromisingETs.index
 
     # 2.5) Combine TBs and ETs and apply LOF calculation
-    trainTAG_df = combine(TB_COM_df=LOF(trainTBs), ET_COM_df=LOF(trainETs)); testTAG_df = combine(TB_COM_df=LOF(testTBs), ET_COM_df=LOF(testETs))
-    trainTAG_df.to_csv('trainTAG_df.csv'); testTAG_df.to_csv('testTAG_df.csv')
+    trainTAG_df = combine(TB_COM_df=trainTBs, ET_COM_df=trainETs); testTAG_df = combine(TB_COM_df=testTBs, ET_COM_df=testETs)
+    #trainTAG_df.to_csv('trainTAG_df.csv'); testTAG_df.to_csv('testTAG_df.csv')
 
     # 3) LOF, combine TBs+ETs and then feed into tagger
     TAGs = thirdStage(train_TAG_df=trainTAG_df, test_TAG_df=testTAG_df, train_TB_scores=trainpromisingTBs, test_TB_scores=testpromisingTBs,

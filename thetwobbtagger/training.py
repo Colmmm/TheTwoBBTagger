@@ -6,47 +6,61 @@ from sklearn.preprocessing import StandardScaler
 from tqdm import tqdm
 from sklearn.metrics import roc_auc_score, accuracy_score, recall_score, precision_score, classification_report
 from ml_insights import prob_calibration_function
+import lightgbm as lgb
 
-def CV(train_twoBBdf, test_twoBBdf, nfolds=5, random_seed = 42, array_index=False, justdf=False):
-    #this if statement is for thirdStage, where we dont have a twoBBdf object for data but just a df, so needs to be treated differently
-    if justdf==True:
-        train_df = train_twoBBdf
-        test_df = test_twoBBdf
-        target = 'SignalB_ID'
-        feats = [c for c in train_df.columns if c not in target]
-    else:
-        #retrieves the df for the MVA
-        train_df = train_twoBBdf.get_MVAdf()
-        test_df = test_twoBBdf.get_MVAdf()
-        #below if statement is if were dealing with ETs and have an extra column '__array_index' added, which we need to remove for training purposes
-        if array_index==True:
-            feats = [c for c in train_df.columns if c not in train_twoBBdf.label+train_twoBBdf.ids+ ['__array_index']]
-        #we need to remove the id like columns/branches for training, as well as the label
-        feats = [c for c in train_df.columns if c not in train_twoBBdf.label+train_twoBBdf.ids]
-        target = train_twoBBdf.label[0] #we have [0] as label is inputted as a list
+def CV(train_twoBBdf, test_twoBBdf, nfolds=7, random_seed = 42, justdf=False):
+    #retrieves the df for the MVA
+    train_df_generator = train_twoBBdf.get_MVAdf_generator()
+    test_df_generator = test_twoBBdf.get_MVAdf_generator()
 
-    X_train = train_df[feats] ; y_train = train_df[target]
-    X_test = test_df[feats] ; y_test = test_df[target]
-    ids1 = X_train.index ; ids2 = X_test.index #we need to remember the ids as we will be converting data from pandas df to np.arrays
+    #as we are doing the training and predicti
+    all_preds = pd.Series()
+    all_labels = pd.Series()
 
-    #initalise empty series where the predictions will be inputted
-    oof = pd.Series(np.zeros(shape=y_train.shape[0]), index=ids1)
-    preds = pd.Series(np.zeros(shape=y_test.shape[0]), index=ids2)
+    model = None
+    lgb_params = {
+        'keep_training_booster': True,
+        'objective': 'binary',
+        'verbose_eval': -1,
+        'verbose': -1
+    }
 
-    #we join the data together again so we can normalise it, and then we split up again
-    all_data = pd.concat([X_train, X_test])
-    norm_data = StandardScaler().fit_transform(all_data)
-    X_train = norm_data[:X_train.shape[0]] ; y_train = y_train.to_numpy()
-    X_test = norm_data[X_train.shape[0]:] ; y_test = y_test.to_numpy()
+    for train_df, test_df in zip(train_df_generator, test_df_generator):
+        if train_twoBBdf.label == ['TwoBody_Extra_FromSameB']:
+            feats = [c for c in train_df.columns if c not in train_df.label + train_df.ids + ['__array_index']]
+        if train_twoBBdf.label == ['TwoBody_FromSameB']:
+            feats = [c for c in train_df.columns if c not in train_df.label + train_df.ids]
+        X_train = train_df[feats]
+        y_train = train_df[train_twoBBdf.label]
+        X_test = test_df[feats]
+        y_test = test_df[train_twoBBdf.label]
+        ids1 = X_train.index ; ids2 = X_test.index #we need to remember the ids as we will be converting data from pandas df to np.arrays
 
-    #KFOLD
-    skf = KFold(n_splits=nfolds, random_state=random_seed)
-    #so we split data into nfolds and we train n different models that train and predict on different subections of training data, they all pred on test data though
-    for train_idx, cv_index in tqdm(skf.split(X_train, y_train), total= skf.n_splits):
-        model = LGBMClassifier()
-        model.fit(X_train[train_idx], y_train[train_idx])
-        oof.iloc[cv_index] = model.predict_proba(X_train[cv_index])[:,1]
-        preds += model.predict_proba((X_test))[:,1] / skf.n_splits
+        #initalise empty series where the predictions will be inputted
+        preds = pd.Series(np.zeros(shape=y_test.shape[0]), index=ids2)
+        labels = y_test
+
+        #we join the data together again so we can normalise it, and then we split up again
+        all_data = pd.concat([X_train, X_test])
+        norm_data = StandardScaler().fit_transform(all_data)
+        X_train = norm_data[:X_train.shape[0]] ; y_train = y_train.to_numpy()
+        X_test = norm_data[X_train.shape[0]:] ; y_test = y_test.to_numpy()
+
+        model = lgb.train(lgb_params,
+                          # Pass partially trained model:
+                          init_model=model,
+                          train_set=lgb.Dataset(X_train, y_train),
+                          valid_sets=lgb.Dataset(X_test, y_test))
+
+        preds.loc[ids2] = model.predict(X_test)
+
+        all_preds = pd.concat([all_preds, preds])
+        all_labels = pd.concat([all_labels, labels])
+        
+
+
+
+
 
     print(oof.shape, preds.shape)
     #calibrating the output of the ML algorithm

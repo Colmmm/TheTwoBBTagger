@@ -12,7 +12,7 @@ def firstStage(train_TBs, test_TBs ,threshold, random_seed=42):
        series with a TBs index and the probabilities outputted by the TB MVA.
     """
     print('\nFirst Stage starting...\n\n')
-    train_probs, test_probs = CV(train_twoBBdf=train_TBs, test_twoBBdf=test_TBs, nfolds=5, random_seed=random_seed, array_index=False )
+    train_probs, test_probs = CV(train_twoBBdf=train_TBs, test_twoBBdf=test_TBs, nfolds=7, random_seed=random_seed, array_index=False )
     train_probs = train_probs[train_probs>threshold] ; test_probs = test_probs[test_probs>threshold]
 
     #at the moment, second stage cant deal with TBs without ETs, so I just get rid of the TBs without ETs for now
@@ -32,7 +32,7 @@ def secondStage(train_ETs, test_ETs, threshold, random_seed=42):
        then outputs
      """
     print('\nSecond Stage Starting...\n')
-    train_probs, test_probs = CV(train_twoBBdf=train_ETs, test_twoBBdf=test_ETs, nfolds=5, random_seed=random_seed, array_index=True)
+    train_probs, test_probs = CV(train_twoBBdf=train_ETs, test_twoBBdf=test_ETs, nfolds=7, random_seed=random_seed, array_index=True)
     train_probs = train_probs[train_probs>threshold] ; test_probs = test_probs[test_probs>threshold]
     print('\n\nSecond Stage Complete!!!\n\n')
     return train_probs, test_probs

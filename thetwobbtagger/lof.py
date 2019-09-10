@@ -148,7 +148,7 @@ def LOF(dfx):
 
     return flatten_vector_features(df=df_with_MM2_and_Etracks, vector_features=vector_features)
 
-def combine(TB_COM_df, ET_COM_df):
+def combine(TB_COM_df, ET_COM_df, max_ETs=4):
     """"This function combines the TB_COM_df and the ET_COM_df together and works as the following:
         1) Get rid TB vertex duplicates, ie, so we only have one extra track per TB (call this dfA)
         2) Take note of what Extra tracks were kept in step 1), and remove them via their extra track index
@@ -161,7 +161,7 @@ def combine(TB_COM_df, ET_COM_df):
     count = 0
     # defining the extra tracks that need to be added, and looping over until theres none left
     need_adding = ET_COM_df
-    while len(need_adding) != 0:
+    while len(need_adding) != 0 and count <= max_ETs:
 
         # defining the track ids that will be added to the TB_df next
         being_added = need_adding['TB_id'].drop_duplicates().index.to_list()

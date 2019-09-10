@@ -28,35 +28,46 @@ class twoBBdf:
             self.probs4LOF = [['TwoBody_Extra_NNp', 'TwoBody_Extra_NNk', 'TwoBody_Extra_NNpi', 'TwoBody_Extra_NNe', 'TwoBody_Extra_NNmu']]
             self.tracknames4LOF = ['extra_track']
 
-    def get_MVAdf(self):
+    def get_MVAdf_generator(self, chunk_size=10000):
         '''this method creates the df with the right columns/branches from the root df for the MVA procedure'''
-        MVAdf = read_root(paths=self.path, columns=self.ids+self.label+self.feats4MVA, flatten=self.flatfeats4MVA)
-        #always change index to be a TB index first, just in case we only want a select few of TBs, which we cant do if we have a ET index
-        MVAdf.index = MVAdf.apply(lambda x:str(int(x.runNumber)) + str(int(x.eventNumber))+'-'+str(int(x.nCandidate)), axis=1 )
-        #if specific_TBs is not empty then we need to filter out the unwanted TBs by their id
-        if self.specific_TBs.shape[0] != 0:
-            MVAdf = MVAdf.loc[self.specific_TBs, :]
-        #we then change the index according to whether were dealing with TBs or ETs, if its TBs then the index is essentially left unchanged
-        MVAdf.index = MVAdf.apply(self.index_function, axis=1)
-        #if specific_ETs is not empty that means we need to filter out and keep only the ETs asked for by using their ids
-        if self.specific_ETs.shape[0]!=0:
-            MVAdf = MVAdf.loc[self.specific_ETs, :]
-        return MVAdf
+        MVAdf_generator = read_root(paths=self.path, columns=self.ids + self.feats4MVA + self.label, flatten=self.flatfeats4MVA, chunksize=chunk_size)
 
-    def get_LOFdf(self):
+        for chunkdf in MVAdf_generator:
+            #always change index to be a TB index first, just in case we only want a select few of TBs, which we cant do if we have a ET index
+            chunkdf.index = chunkdf.apply(lambda x:str(int(x.runNumber)) + str(int(x.eventNumber))+'-'+str(int(x.nCandidate)), axis=1 )
+            #if specific_TBs is not empty then we need to filter out the unwanted TBs by their id
+            if self.specific_TBs.shape[0] != 0:
+                chunkdf = chunkdf.loc[self.specific_TBs, :]
+            #we then change the index according to whether were dealing with TBs or ETs, if its TBs then the index is essentially left unchanged
+            chunkdf.index = chunkdf.apply(self.index_function, axis=1)
+            #if specific_ETs is not empty that means we need to filter out and keep only the ETs asked for by using their ids
+            if self.specific_ETs.shape[0]!=0:
+                chunkdf = chunkdf.loc[self.specific_ETs, :]
+            # below if statement is if were dealing with ETs and have an extra column '__array_index' added, which we need to remove for training purposes
+            if self.label == ['TwoBody_Extra_FromSameB']:
+                feats = [c for c in chunkdf.columns if c not in chunkdf.label+chunkdf.ids+['__array_index']]
+            if self.label == ['TwoBody_FromSameB']:
+                feats = [c for c in chunkdf.columns if c not in chunkdf.label+chunkdf.ids]
+            X = chunkdf[feats]
+            y = chunkdf[self.label]
+            yield X, y
+
+    def get_LOFdf_generator(self, chunk_size=10000):
         '''this method creates the df with the right columns/branches in which to perform the LOF calculation on, and require the COM variables for the TBs and ETs'''
-        LOFdf = read_root(paths=self.path, columns=self.ids + self.feats4LOF, flatten=self.flatfeats4LOF)
-        #always change index to be a TB index first, just in case we only want a select few of TBs, which we cant do if we have a ET index
-        LOFdf.index = LOFdf.apply(lambda x: str(int(x.runNumber)) + str(int(x.eventNumber)) + '-' + str(int(x.nCandidate)), axis=1)
-        # if specific_TBs is not empty then we need to filter out the unwanted TBs by their id
-        if self.specific_TBs.shape[0]!=0:
-            LOFdf = LOFdf.loc[self.specific_TBs,:]
-        # we then change the index according to whether were dealing with TBs or ETs, if its TBs then the index is essentially left unchanged
-        LOFdf.index = LOFdf.apply(self.index_function, axis=1)
-        #if specific_ETs is not empty that means we need to filter out and keep only the ETs asked for by using their ids
-        if self.specific_ETs.shape[0]!=0:
-            LOFdf = LOFdf.loc[self.specific_ETs, :]
+        LOFdf_generator = read_root(paths=self.path, columns=self.ids + self.feats4LOF, flatten=self.flatfeats4LOF, chunksize=chunk_size)
 
-        return LOFdf
+        for chunkdf in LOFdf_generator:
+            #always change index to be a TB index first, just in case we only want a select few of TBs, which we cant do if we have a ET index
+            chunkdf.index = chunkdf.apply(lambda x: str(int(x.runNumber)) + str(int(x.eventNumber)) + '-' + str(int(x.nCandidate)), axis=1)
+            # if specific_TBs is not empty then we need to filter out the unwanted TBs by their id
+            if self.specific_TBs.shape[0]!=0:
+                chunkdf = chunkdf.loc[self.specific_TBs,:]
+            # we then change the index according to whether were dealing with TBs or ETs, if its TBs then the index is essentially left unchanged
+            chunkdf.index = chunkdf.apply(self.index_function, axis=1)
+            #if specific_ETs is not empty that means we need to filter out and keep only the ETs asked for by using their ids
+            if self.specific_ETs.shape[0]!=0:
+               chunkdf = chunkdf.loc[self.specific_ETs, :]
+
+            yield chunkdf
 
 

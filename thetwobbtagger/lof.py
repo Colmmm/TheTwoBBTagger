@@ -159,7 +159,6 @@ def combine(TB_COM_df, ET_COM_df, max_ETs=2):
         # we also need to remove these ids from the tracks that need_adding list
         updated_need_adding_ids = [track for track in need_adding.index if track not in being_added]
         need_adding = need_adding.loc[updated_need_adding_ids]
-
         # initialising df to be merged with COM_TB_df, also getting rid of pointless features such as those already in TB df
         feats = [feat for feat in ET_COM_df.columns if feat not in TB_COM_df.columns + ['__array_index']] + ['TB_id']
         print(feats)
@@ -168,7 +167,6 @@ def combine(TB_COM_df, ET_COM_df, max_ETs=2):
         print(being_added_df.columns)
         # need to change index of being_added_df so it can be merged with the TB_df
         being_added_df.index = being_added_df['TB_id']
-        [c for c in being_added_df.columns if c not in ]
         being_added_df = being_added_df.drop(columns=(['TB_id']), axis=1)
         # we also need to change names of the being_added_df columns as we will be adding more than one
         being_added_df.columns = [name + '_' + str(count) for name in being_added_df.columns]

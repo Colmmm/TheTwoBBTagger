@@ -1,3 +1,6 @@
+from root_pandas import read_root
+import pandas as pd
+
 def preprocess4TAGGING(TAG_df, TB_scores, path):
     """this function prepares the TAG_df for tagging, it does this by reading in the tagging labels (SignalB_ID) and also
        the ids and then joining them onto the TAG_df. This also replaces the labels from being +/-521 to 1/0. TB scores is

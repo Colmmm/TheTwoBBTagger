@@ -74,16 +74,6 @@ def track_four_momentum(x, three_momentum_labels, PID_labels):
 
     return p4_vector
 
-def flatten_vector_features(df, vector_features):
-    vector_df = df[vector_features]
-    for col_name in vector_df.columns:
-        vector_df.loc[:, col_name+ '_X'] = vector_df.apply(lambda x: x[col_name][0], axis=1)
-        vector_df.loc[:, col_name+ '_Y'] = vector_df.apply(lambda x: x[col_name][1], axis=1)
-        vector_df.loc[:, col_name+ '_Z'] = vector_df.apply(lambda x: x[col_name][2], axis=1)
-        vector_df = vector_df.drop(columns=[col_name], axis=0)
-    vector_free_cols = [c for c in df.columns if c not in vector_features]
-    flatten_vector_df = pd.concat([df[vector_free_cols], vector_df], axis=1)
-    return flatten_vector_df
 
 def MM2_calculator(df, B_M_nominal=5279.5):
     """Main function to calculate COM values, input is df, and output is same
@@ -142,11 +132,12 @@ def LOF(dfx):
     for i in range(len(dfx.tracknames4LOF)):
         df_with_MM2_and_Etracks = Etrack_calculator(df_with_MM2, three_momentum=dfx.threemomentum4LOF[i], probs=dfx.probs4LOF[i], name=dfx.tracknames4LOF[i])
 
-    #flattening vector like features
+    #removing vector like features
     vector_types = [LorentzVector, np.ndarray, Vector3D]
     vector_features = [c for c in df_with_MM2_and_Etracks.columns if type(df_with_MM2_and_Etracks[c].values[0]) in vector_types]
+    df_with_MM2_and_Etracks = df_with_MM2_and_Etracks.drop(columns=vector_features, axis=1)
 
-    return flatten_vector_features(df=df_with_MM2_and_Etracks, vector_features=vector_features)
+    return df_with_MM2_and_Etracks
 
 def combine(TB_COM_df, ET_COM_df, max_ETs=2):
     """"This function combines the TB_COM_df and the ET_COM_df together and works as the following:
@@ -171,11 +162,14 @@ def combine(TB_COM_df, ET_COM_df, max_ETs=2):
 
         # initialising df to be merged with COM_TB_df, also getting rid of pointless features such as those already in TB df
         feats = [feat for feat in ET_COM_df.columns if feat not in TB_COM_df.columns + ['__array_index']] + ['TB_id']
+        print(feats)
+        print('\n\n\n')
         being_added_df = ET_COM_df.loc[being_added, feats]
         print(being_added_df.columns)
         # need to change index of being_added_df so it can be merged with the TB_df
         being_added_df.index = being_added_df['TB_id']
-        being_added_df = being_added_df.drop(columns=(['TB_id']))
+        [c for c in being_added_df.columns if c not in ]
+        being_added_df = being_added_df.drop(columns=(['TB_id']), axis=1)
         # we also need to change names of the being_added_df columns as we will be adding more than one
         being_added_df.columns = [name + '_' + str(count) for name in being_added_df.columns]
         # time to merge the being_added_df to the TB_df

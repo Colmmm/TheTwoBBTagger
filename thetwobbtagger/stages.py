@@ -58,6 +58,8 @@ def thirdStage(train_TAG_df, test_TAG_df,  train_TB_scores, test_TB_scores, trai
     per_event_TAG = per_event_TAG.drop(per_event_TAG.query('label!=0.0 and label!=1.0').index, axis=0)
 
     print('\n\nThird Stage Complete!!\n')
+    print('\n\n')
+    print(per_event_TAG.head())
     acc = accuracy_score(per_event_TAG.label, round(per_event_TAG.pred)) ; print('\nThe final Tagging Accuracy:\n{0}'.format(acc))
     tag_eff = 0.89*(per_event_TAG.shape[0]/1114) ; print('\nTagging efficiency:\n{0}'.format(tag_eff))
     print('\nOVERALL TAGGING POWER:\n{0}'.format(  tag_eff*(1-2*(1-acc))**2)  )

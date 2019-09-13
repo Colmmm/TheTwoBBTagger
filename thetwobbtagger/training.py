@@ -12,8 +12,12 @@ import gc ; gc.enable()
 
 def CV(train_twoBBdf, test_twoBBdf, chunk_size=1000,  nfolds=7, random_seed=42, justdf=False):
     # retrieves the df for the MVA
-    train_df_generator = train_twoBBdf.get_MVAdf_generator(chunk_size=chunk_size)
-    test_df_generator = test_twoBBdf.get_MVAdf_generator(chunk_size=chunk_size)
+    if justdf ==True:
+        train_df_generator = train_twoBBdf
+        test_df_generator = test_twoBBdf
+    else:
+        train_df_generator = train_twoBBdf.get_MVAdf_generator(chunk_size=chunk_size)
+        test_df_generator = test_twoBBdf.get_MVAdf_generator(chunk_size=chunk_size)
 
     # as we are doing the training and predictions in batches, we need to define a main preds list which then gets added to after each batch
     TRAIN_PREDS = pd.Series()

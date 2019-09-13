@@ -1,5 +1,6 @@
 import pandas as pd
 from root_pandas import read_root
+from tqdm import tqdm
 
 class twoBBdf:
     def __init__(self, path, dict, specific_TBs=pd.Series(), specific_ETs=pd.Series()):
@@ -33,28 +34,30 @@ class twoBBdf:
         MVAdf_generator = read_root(paths=self.path, columns=self.ids + self.feats4MVA + self.label,
                                     flatten=self.flatfeats4MVA, chunksize=chunk_size)
 
-        for chunkdf in MVAdf_generator:
+        for chunkdf in tqdm(MVAdf_generator, unit='chunks'):
+            print('start:')
+            print(chunkdf.shape)
             # always change index to be a TB index first, just in case we only want a select few of TBs, which we cant do if we have a ET index
             chunkdf.index = chunkdf.apply(
                 lambda x: str(int(x.runNumber)) + str(int(x.eventNumber)) + '-' + str(int(x.nCandidate)), axis=1)
             # if specific_TBs is not empty then we need to filter out the unwanted TBs by their id
-            print('why1')
-            print(chunkdf.shape)
+
             if self.specific_TBs.shape[0] != 0:
                 chunkdf = chunkdf.loc[self.specific_TBs, :]
             # we then change the index according to whether were dealing with TBs or ETs, if its TBs then the index is essentially left unchanged
 
-            print('why')
-            print(chunkdf.shape)
+
             debug = [r for r in chunkdf.index if r not in ['531404615849577-1', '531404615848315-8']]
             chunkdf = chunkdf.dropna(axis=0)
-            print('\n\nhi again\n\n')
+            print('after dropna:')
             print(chunkdf.shape)
 
             chunkdf.index = chunkdf.apply(self.index_function, axis=1)
             # if specific_ETs is not empty that means we need to filter out and keep only the ETs asked for by using their ids
             if self.specific_ETs.shape[0] != 0:
                 chunkdf = chunkdf.loc[self.specific_ETs, :]
+            print('after index function:')
+            print(chunkdf.shape)
 
             yield chunkdf
 

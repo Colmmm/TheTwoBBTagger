@@ -28,6 +28,36 @@ class twoBBdf:
             self.probs4LOF = [['TwoBody_Extra_NNp', 'TwoBody_Extra_NNk', 'TwoBody_Extra_NNpi', 'TwoBody_Extra_NNe', 'TwoBody_Extra_NNmu']]
             self.tracknames4LOF = ['extra_track']
 
+    def get_MVAdf_generator(self, chunk_size=100):
+        '''this method creates the df with the right columns/branches from the root df for the MVA procedure'''
+        MVAdf_generator = read_root(paths=self.path, columns=self.ids + self.feats4MVA + self.label,
+                                    flatten=self.flatfeats4MVA, chunksize=chunk_size)
+
+        for chunkdf in MVAdf_generator:
+            # always change index to be a TB index first, just in case we only want a select few of TBs, which we cant do if we have a ET index
+            chunkdf.index = chunkdf.apply(
+                lambda x: str(int(x.runNumber)) + str(int(x.eventNumber)) + '-' + str(int(x.nCandidate)), axis=1)
+            # if specific_TBs is not empty then we need to filter out the unwanted TBs by their id
+            print('why1')
+            print(chunkdf.shape)
+            if self.specific_TBs.shape[0] != 0:
+                chunkdf = chunkdf.loc[self.specific_TBs, :]
+            # we then change the index according to whether were dealing with TBs or ETs, if its TBs then the index is essentially left unchanged
+
+            print('why')
+            print(chunkdf.shape)
+            debug = [r for r in chunkdf.index if r not in ['531404615849577-1']]
+            chunkdf = chunkdf.loc[debug]
+            print('\n\nhi again\n\n')
+            print(chunkdf.shape)
+
+            chunkdf.index = chunkdf.apply(self.index_function, axis=1)
+            # if specific_ETs is not empty that means we need to filter out and keep only the ETs asked for by using their ids
+            if self.specific_ETs.shape[0] != 0:
+                chunkdf = chunkdf.loc[self.specific_ETs, :]
+
+            yield chunkdf
+
     def get_MVAdf(self):
         '''this method creates the df with the right columns/branches from the root df for the MVA procedure'''
         MVAdf = read_root(paths=self.path, columns=self.ids+self.label+self.feats4MVA, flatten=self.flatfeats4MVA)

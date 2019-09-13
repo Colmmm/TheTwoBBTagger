@@ -46,8 +46,8 @@ class twoBBdf:
 
             print('why')
             print(chunkdf.shape)
-            debug = [r for r in chunkdf.index if r not in ['531404615849577-1']]
-            chunkdf = chunkdf.loc[debug]
+            debug = [r for r in chunkdf.index if r not in ['531404615849577-1', '531404615848315-8']]
+            chunkdf = chunkdf.dropna(axis=0)
             print('\n\nhi again\n\n')
             print(chunkdf.shape)
 

@@ -29,7 +29,7 @@ def secondStage(train_ETs, test_ETs, threshold, random_seed=42):
        then outputs
      """
     print('\nSecond Stage Starting...\n')
-    train_probs, test_probs = CV(train_twoBBdf=train_ETs, test_twoBBdf=test_ETs, nfolds=5, random_seed=random_seed, chunk_size=1000)
+    train_probs, test_probs = CV(train_twoBBdf=train_ETs, test_twoBBdf=test_ETs, nfolds=5, random_seed=random_seed, chunk_size=100)
     train_probs = train_probs[train_probs>threshold] ; test_probs = test_probs[test_probs>threshold]
     print('\n\nSecond Stage Complete!!!\n\n')
     return train_probs, test_probs

@@ -149,6 +149,7 @@ def combine(TB_COM_df, ET_COM_df, max_ETs=2):
     TB_COM_df['TB_id'] =  TB_COM_df.apply(lambda x: str(int(x.runNumber)) + str(int(x.eventNumber))+'-'+str(int(x.nCandidate)), axis=1)
     ET_COM_df['TB_id'] = ET_COM_df.apply(lambda x: str(int(x.runNumber)) + str(int(x.eventNumber)) + '-' + str(int(x.nCandidate)), axis=1)
 
+
     count = 0
     # defining the extra tracks that need to be added, and looping over until theres none left
     need_adding = ET_COM_df
@@ -161,13 +162,25 @@ def combine(TB_COM_df, ET_COM_df, max_ETs=2):
         need_adding = need_adding.loc[updated_need_adding_ids]
         # initialising df to be merged with COM_TB_df, also getting rid of pointless features such as those already in TB df
         feats = [feat for feat in ET_COM_df.columns if feat not in TB_COM_df.columns+['__array_index'] ] + ['TB_id']
-        print('\n\nfeats in TB df:')
-        print(TB_COM_df.columns)
-        print(TB_COM_df.shape)
-        print('\n\n\nfeats in added ET:')
+
+        feats = [
+    'TwoBody_Extra_VERTEXCHI2',
+    'TwoBody_Extra_MINIPCHI2',
+    'TwoBody_Extra_OPENING',
+    'TwoBody_Extra_PT',
+    'TwoBody_Extra_FLIGHT',
+    'TwoBody_Extra_TRACKCHI2',
+    'TwoBody_Extra_GHOST',
+    'TwoBody_Extra_TYPE',
+    'TwoBody_Extra_FromSameB'] + ['TB_id']
+
+        #print('\n\nfeats in TB df:')
+        #print(TB_COM_df.columns)
+        #print(TB_COM_df.shape)
+        #print('\n\n\nfeats in added ET:')
         being_added_df = ET_COM_df.loc[being_added, feats]
-        print(being_added_df.columns)
-        print(being_added_df.shape)
+        #print(being_added_df.columns)
+        #print(being_added_df.shape)
         # need to change index of being_added_df so it can be merged with the TB_df
         being_added_df.index = being_added_df['TB_id']
         being_added_df = being_added_df.drop(columns=(['TB_id']), axis=1)
@@ -178,4 +191,6 @@ def combine(TB_COM_df, ET_COM_df, max_ETs=2):
 
         count += 1
 
+    print('am i ruining it??')
+    print(TB_COM_df.shape)
     return TB_COM_df

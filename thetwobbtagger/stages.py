@@ -2,7 +2,7 @@ from training import CV
 import pandas as pd
 from sklearn.metrics import accuracy_score
 from utils import score_combiner, preprocess4TAGGING
-train_path = '../TaggingJpsiK2012_fix_fix_1.root'
+train_path = '../TaggingJpsiK2012_tiny_fix_fix.root'
 test_path = '../TaggingJpsiK2012_tiny_fix_fixSlice2.root'
 
 def firstStage(train_TBs, test_TBs ,threshold, chunk_size, random_seed=42):
@@ -13,8 +13,11 @@ def firstStage(train_TBs, test_TBs ,threshold, chunk_size, random_seed=42):
     """
     print('\nFirst Stage starting...\n\n')
     TB_train_df, TB_test_df, train_probs, test_probs,  = CV(train_twoBBdf=train_TBs, test_twoBBdf=test_TBs, nfolds=5, random_seed=random_seed, array_index=False, chunk_size=chunk_size )
+    print('hey1')
+    print(TB_test_df.shape)
     TB_train_df = TB_train_df.loc[train_probs>threshold] ; TB_test_df = TB_test_df.loc[test_probs>threshold]
-
+    train_probs = train_probs[train_probs>threshold] ; test_probs = test_probs[test_probs>threshold]
+    print(TB_test_df.shape)
     print('\n\nFirst Stage Complete!!!\n\n')
     return TB_train_df, TB_test_df, train_probs, test_probs
 
@@ -26,7 +29,10 @@ def secondStage(train_ETs, test_ETs, threshold, chunk_size, random_seed=42):
      """
     print('\nSecond Stage Starting...\n')
     ET_train_df, ET_test_df, train_probs, test_probs = CV(train_twoBBdf=train_ETs, test_twoBBdf=test_ETs, nfolds=5, random_seed=random_seed, array_index=True, chunk_size=chunk_size)
+    print('hey2')
+    print(ET_test_df.shape)
     ET_train_df = ET_train_df[train_probs>threshold] ; ET_test_df = ET_test_df[test_probs>threshold]
+    print(ET_test_df.shape)
     print('\n\nSecond Stage Complete!!!\n\n')
     return ET_train_df, ET_test_df
 
@@ -44,7 +50,8 @@ def thirdStage(train_TAG_df, test_TAG_df,  train_TB_scores, test_TB_scores, trai
 
     #calculate tagging decisions for each TB
     train_TAG_probs, test_TAG_probs = CV(train_twoBBdf=train_TAG_df.drop(columns=ids + ['TB_id'], axis=0), test_twoBBdf=test_TAG_df.drop(columns=ids + ['TB_id'], axis=0),nfolds=5, random_seed=random_seed, justdf=True, chunk_size=None)
-
+    print('\nheuyyyy\n')
+    print(test_TAG_probs.shape)
     #combine TB tag decisions into event tag decisions
     TAG_preds = pd.concat([test_TAG_probs, test_TB_scores, test_event_ids, test_TAG_labels.SignalB_ID], axis=1);
     TAG_preds.columns = ['TAG_scores', 'TB_scores', 'event_id', 'label']

@@ -2,7 +2,7 @@ from training import CV
 import pandas as pd
 from sklearn.metrics import accuracy_score
 from utils import score_combiner, preprocess4TAGGING
-train_path = '../TaggingJpsiK2012_tiny_fix_fix.root'
+train_path = '../TaggingJpsiK2012_fix_fix_1.root'
 test_path = '../TaggingJpsiK2012_tiny_fix_fixSlice2.root'
 
 def firstStage(train_TBs, test_TBs ,threshold, chunk_size, random_seed=42):
@@ -12,7 +12,7 @@ def firstStage(train_TBs, test_TBs ,threshold, chunk_size, random_seed=42):
        series with a TBs index and the probabilities outputted by the TB MVA.
     """
     print('\nFirst Stage starting...\n\n')
-    train_probs, test_probs, TB_train_df, TB_test_df = CV(train_twoBBdf=train_TBs, test_twoBBdf=test_TBs, nfolds=5, random_seed=random_seed, array_index=False, chunk_size=chunk_size )
+    TB_train_df, TB_test_df, train_probs, test_probs,  = CV(train_twoBBdf=train_TBs, test_twoBBdf=test_TBs, nfolds=5, random_seed=random_seed, array_index=False, chunk_size=chunk_size )
     TB_train_df = TB_train_df.loc[train_probs>threshold] ; TB_test_df = TB_test_df.loc[test_probs>threshold]
 
     print('\n\nFirst Stage Complete!!!\n\n')
@@ -25,7 +25,7 @@ def secondStage(train_ETs, test_ETs, threshold, chunk_size, random_seed=42):
        then outputs
      """
     print('\nSecond Stage Starting...\n')
-    train_probs, test_probs, ET_train_df, ET_test_df = CV(train_twoBBdf=train_ETs, test_twoBBdf=test_ETs, nfolds=5, random_seed=random_seed, array_index=True, chunk_size=chunk_size)
+    ET_train_df, ET_test_df, train_probs, test_probs = CV(train_twoBBdf=train_ETs, test_twoBBdf=test_ETs, nfolds=5, random_seed=random_seed, array_index=True, chunk_size=chunk_size)
     ET_train_df = ET_train_df[train_probs>threshold] ; ET_test_df = ET_test_df[test_probs>threshold]
     print('\n\nSecond Stage Complete!!!\n\n')
     return ET_train_df, ET_test_df
@@ -43,7 +43,7 @@ def thirdStage(train_TAG_df, test_TAG_df,  train_TB_scores, test_TB_scores, trai
     test_TAG_df, test_event_ids, test_TAG_labels = preprocess4TAGGING(TAG_df=test_TAG_df, TB_scores=test_TB_scores, path=test_path)
 
     #calculate tagging decisions for each TB
-    train_TAG_probs, test_TAG_probs = CV(train_twoBBdf=train_TAG_df.drop(columns=ids + ['TB_id'], axis=0), test_twoBBdf=test_TAG_df.drop(columns=ids + ['TB_id'], axis=0),nfolds=5, random_seed=random_seed, justdf=True)
+    train_TAG_probs, test_TAG_probs = CV(train_twoBBdf=train_TAG_df.drop(columns=ids + ['TB_id'], axis=0), test_twoBBdf=test_TAG_df.drop(columns=ids + ['TB_id'], axis=0),nfolds=5, random_seed=random_seed, justdf=True, chunk_size=None)
 
     #combine TB tag decisions into event tag decisions
     TAG_preds = pd.concat([test_TAG_probs, test_TB_scores, test_event_ids, test_TAG_labels.SignalB_ID], axis=1);

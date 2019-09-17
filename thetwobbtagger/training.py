@@ -51,7 +51,7 @@ def CV(train_twoBBdf, test_twoBBdf, chunk_size, nfolds=5, random_seed = 42, arra
     #KFOLD
     skf = KFold(n_splits=nfolds, random_state=random_seed)
     #so we split data into nfolds and we train n different models that train and predict on different subections of training data, they all pred on test data though
-    print('Kfold training...')
+    print('\nKfold training...')
     for train_idx, cv_index in tqdm(skf.split(X_train, y_train), total= skf.n_splits):
         model = LGBMClassifier()
         model.fit(X_train[train_idx], y_train[train_idx])
@@ -72,7 +72,7 @@ def CV(train_twoBBdf, test_twoBBdf, chunk_size, nfolds=5, random_seed = 42, arra
 
     del X_train, X_test, y_train, y_test, all_data, norm_data
     gc.collect()
-    if justdf ==True:
-        return oof, preds, train_df, test_df
+    if justdf ==False:
+        return train_df, test_df, oof, preds,
     else:
         return oof, preds

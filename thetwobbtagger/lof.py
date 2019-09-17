@@ -162,10 +162,12 @@ def combine(TB_COM_df, ET_COM_df, max_ETs=2):
         # initialising df to be merged with COM_TB_df, also getting rid of pointless features such as those already in TB df
         feats = [feat for feat in ET_COM_df.columns if feat not in TB_COM_df.columns+['__array_index'] ] + ['TB_id']
         print('\n\nfeats in TB df:')
-        print(TB_COM_df)
+        print(TB_COM_df.columns)
+        print(TB_COM_df.shape)
         print('\n\n\nfeats in added ET:')
         being_added_df = ET_COM_df.loc[being_added, feats]
         print(being_added_df.columns)
+        print(being_added_df.shape)
         # need to change index of being_added_df so it can be merged with the TB_df
         being_added_df.index = being_added_df['TB_id']
         being_added_df = being_added_df.drop(columns=(['TB_id']), axis=1)

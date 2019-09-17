@@ -5,31 +5,31 @@ from utils import score_combiner, preprocess4TAGGING
 train_path = '../TaggingJpsiK2012_tiny_fix_fix.root'
 test_path = '../TaggingJpsiK2012_tiny_fix_fixSlice2.root'
 
-def firstStage(train_TBs, test_TBs ,threshold, random_seed=42):
+def firstStage(train_TBs, test_TBs ,threshold, chunk_size, random_seed=42):
     """This function takes a TB's twobbdf object as its input, and then calculates the probabilities of how likely each
        TB comes from the decay of the Tagging B. These TBs are then filtered by getting rid of any TBs which have
        probabilities below the threshold (which is specified as an input parameter). This function then outputs a pandas
        series with a TBs index and the probabilities outputted by the TB MVA.
     """
     print('\nFirst Stage starting...\n\n')
-    train_probs, test_probs = CV(train_twoBBdf=train_TBs, test_twoBBdf=test_TBs, nfolds=5, random_seed=random_seed, array_index=False )
+    train_probs, test_probs = CV(train_twoBBdf=train_TBs, test_twoBBdf=test_TBs, nfolds=5, random_seed=random_seed, array_index=False, chunk_size=chunk_size )
     train_probs = train_probs[train_probs>threshold] ; test_probs = test_probs[test_probs>threshold]
 
     #at the moment, second stage cant deal with TBs without ETs, so I just get rid of the TBs without ETs for now
-    train_probs = train_probs.loc[train_TBs.get_MVAdf().query('TwoBody_n_Extra!=0').index]
-    test_probs = test_probs.loc[test_TBs.get_MVAdf().query('TwoBody_n_Extra!=0').index]
+    train_probs = train_probs.loc[train_TBs.get_MVAdf(chunk_size=chunk_size).query('TwoBody_n_Extra!=0').index]
+    test_probs = test_probs.loc[test_TBs.get_MVAdf(chunk_size=chunk_size).query('TwoBody_n_Extra!=0').index]
 
     print('\n\nFirst Stage Complete!!!\n\n')
     return train_probs, test_probs
 
-def secondStage(train_ETs, test_ETs, threshold, random_seed=42):
+def secondStage(train_ETs, test_ETs, threshold, chunk_size, random_seed=42):
     """This function takes an ET twobbdf object as its input, and then calculates the probabilities of whether or not
        each ET comes from the decay of the Tagging B. Then similar to the TB case, the ETs are filtered by getting rid
        of any ET which has a probability below the threshold (which is specified as an input parameter). This function
        then outputs
      """
     print('\nSecond Stage Starting...\n')
-    train_probs, test_probs = CV(train_twoBBdf=train_ETs, test_twoBBdf=test_ETs, nfolds=5, random_seed=random_seed, array_index=True)
+    train_probs, test_probs = CV(train_twoBBdf=train_ETs, test_twoBBdf=test_ETs, nfolds=5, random_seed=random_seed, array_index=True, chunk_size=chunk_size)
     train_probs = train_probs[train_probs>threshold] ; test_probs = test_probs[test_probs>threshold]
     print('\n\nSecond Stage Complete!!!\n\n')
     return train_probs, test_probs

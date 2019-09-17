@@ -7,7 +7,7 @@ from tqdm import tqdm
 from sklearn.metrics import roc_auc_score, accuracy_score, recall_score, precision_score, classification_report
 from ml_insights import prob_calibration_function
 
-def CV(train_twoBBdf, test_twoBBdf, nfolds=5, random_seed = 42, array_index=False, justdf=False):
+def CV(train_twoBBdf, test_twoBBdf, chunk_size, nfolds=5, random_seed = 42, array_index=False, justdf=False):
     #this if statement is for thirdStage, where we dont have a twoBBdf object for data but just a df, so needs to be treated differently
     if justdf==True:
         train_df = train_twoBBdf
@@ -16,8 +16,8 @@ def CV(train_twoBBdf, test_twoBBdf, nfolds=5, random_seed = 42, array_index=Fals
         feats = [c for c in train_df.columns if c not in target]
     else:
         #retrieves the df for the MVA
-        train_df = train_twoBBdf.get_MVAdf()
-        test_df = test_twoBBdf.get_MVAdf()
+        train_df = train_twoBBdf.get_MVAdf(chunk_size=chunk_size)
+        test_df = test_twoBBdf.get_MVAdf(chunk_size=chunk_size)
         #below if statement is if were dealing with ETs and have an extra column '__array_index' added, which we need to remove for training purposes
         if array_index==True:
             feats = [c for c in train_df.columns if c not in train_twoBBdf.label+train_twoBBdf.ids+ ['__array_index']]

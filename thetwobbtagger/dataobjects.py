@@ -1,5 +1,7 @@
 import pandas as pd
 from root_pandas import read_root
+from tqdm import tqdm
+import gc
 
 class twoBBdf:
     def __init__(self, path, dict, specific_TBs=pd.Series(), specific_ETs=pd.Series()):
@@ -28,9 +30,14 @@ class twoBBdf:
             self.probs4LOF = [['TwoBody_Extra_NNp', 'TwoBody_Extra_NNk', 'TwoBody_Extra_NNpi', 'TwoBody_Extra_NNe', 'TwoBody_Extra_NNmu']]
             self.tracknames4LOF = ['extra_track']
 
-    def get_MVAdf(self):
+    def get_MVAdf(self, chunk_size):
         '''this method creates the df with the right columns/branches from the root df for the MVA procedure'''
-        MVAdf = read_root(paths=self.path, columns=self.ids+self.label+self.feats4MVA, flatten=self.flatfeats4MVA)
+        gc.enable()
+        MVAdf_generator = read_root(paths=self.path, columns=self.ids+self.label+self.feats4MVA, flatten=self.flatfeats4MVA, chunksize=chunk_size)
+        MVAdf = pd.DataFrame()
+        for chunk_df in tqdm(MVAdf_generator, unit='chunks'):
+            MVAdf = pd.concat([MVAdf, chunk_df])
+            del chunk_df ; gc.collect()
         #always change index to be a TB index first, just in case we only want a select few of TBs, which we cant do if we have a ET index
         MVAdf.index = MVAdf.apply(lambda x:str(int(x.runNumber)) + str(int(x.eventNumber))+'-'+str(int(x.nCandidate)), axis=1 )
         #if specific_TBs is not empty then we need to filter out the unwanted TBs by their id

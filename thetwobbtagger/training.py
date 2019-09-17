@@ -6,6 +6,7 @@ from sklearn.preprocessing import StandardScaler
 from tqdm import tqdm
 from sklearn.metrics import roc_auc_score, accuracy_score, recall_score, precision_score, classification_report
 from ml_insights import prob_calibration_function
+import gc ; gc.enable()
 
 def CV(train_twoBBdf, test_twoBBdf, chunk_size, nfolds=5, random_seed = 42, array_index=False, justdf=False):
     #this if statement is for thirdStage, where we dont have a twoBBdf object for data but just a df, so needs to be treated differently
@@ -16,8 +17,16 @@ def CV(train_twoBBdf, test_twoBBdf, chunk_size, nfolds=5, random_seed = 42, arra
         feats = [c for c in train_df.columns if c not in target]
     else:
         #retrieves the df for the MVA
+        print('Reading in data....')
+        print('Training Data:')
         train_df = train_twoBBdf.get_MVAdf(chunk_size=chunk_size)
+        print('Testing Data:')
         test_df = test_twoBBdf.get_MVAdf(chunk_size=chunk_size)
+        if train_twoBBdf.label == ['TwoBody_FromSameB']:
+            # at the moment, second stage cant deal with TBs without ETs, so I just get rid of the TBs without ETs for now
+            train_df = train_df.query('TwoBody_n_Extra!=0')
+            test_df = test_df.query('TwoBody_n_Extra!=0')
+
         #below if statement is if were dealing with ETs and have an extra column '__array_index' added, which we need to remove for training purposes
         if array_index==True:
             feats = [c for c in train_df.columns if c not in train_twoBBdf.label+train_twoBBdf.ids+ ['__array_index']]
@@ -42,6 +51,7 @@ def CV(train_twoBBdf, test_twoBBdf, chunk_size, nfolds=5, random_seed = 42, arra
     #KFOLD
     skf = KFold(n_splits=nfolds, random_state=random_seed)
     #so we split data into nfolds and we train n different models that train and predict on different subections of training data, they all pred on test data though
+    print('Kfold training...')
     for train_idx, cv_index in tqdm(skf.split(X_train, y_train), total= skf.n_splits):
         model = LGBMClassifier()
         model.fit(X_train[train_idx], y_train[train_idx])
@@ -60,4 +70,9 @@ def CV(train_twoBBdf, test_twoBBdf, chunk_size, nfolds=5, random_seed = 42, arra
         roc_auc_score(y_test, preds), precision_score(y_test, round(preds)) , recall_score(y_test, round(preds))))
 
 
-    return oof, preds
+    del X_train, X_test, y_train, y_test, all_data, norm_data
+    gc.collect()
+    if justdf ==True:
+        return oof, preds, train_df, test_df
+    else:
+        return oof, preds

@@ -12,15 +12,11 @@ def firstStage(train_TBs, test_TBs ,threshold, chunk_size, random_seed=42):
        series with a TBs index and the probabilities outputted by the TB MVA.
     """
     print('\nFirst Stage starting...\n\n')
-    train_probs, test_probs = CV(train_twoBBdf=train_TBs, test_twoBBdf=test_TBs, nfolds=5, random_seed=random_seed, array_index=False, chunk_size=chunk_size )
-    train_probs = train_probs[train_probs>threshold] ; test_probs = test_probs[test_probs>threshold]
-
-    #at the moment, second stage cant deal with TBs without ETs, so I just get rid of the TBs without ETs for now
-    train_probs = train_probs.loc[train_TBs.get_MVAdf(chunk_size=chunk_size).query('TwoBody_n_Extra!=0').index]
-    test_probs = test_probs.loc[test_TBs.get_MVAdf(chunk_size=chunk_size).query('TwoBody_n_Extra!=0').index]
+    train_probs, test_probs, TB_train_df, TB_test_df = CV(train_twoBBdf=train_TBs, test_twoBBdf=test_TBs, nfolds=5, random_seed=random_seed, array_index=False, chunk_size=chunk_size )
+    TB_train_df = TB_train_df.loc[train_probs>threshold] ; TB_test_df = TB_test_df.loc[test_probs>threshold]
 
     print('\n\nFirst Stage Complete!!!\n\n')
-    return train_probs, test_probs
+    return TB_train_df, TB_test_df, train_probs, test_probs
 
 def secondStage(train_ETs, test_ETs, threshold, chunk_size, random_seed=42):
     """This function takes an ET twobbdf object as its input, and then calculates the probabilities of whether or not
@@ -29,10 +25,10 @@ def secondStage(train_ETs, test_ETs, threshold, chunk_size, random_seed=42):
        then outputs
      """
     print('\nSecond Stage Starting...\n')
-    train_probs, test_probs = CV(train_twoBBdf=train_ETs, test_twoBBdf=test_ETs, nfolds=5, random_seed=random_seed, array_index=True, chunk_size=chunk_size)
-    train_probs = train_probs[train_probs>threshold] ; test_probs = test_probs[test_probs>threshold]
+    train_probs, test_probs, ET_train_df, ET_test_df = CV(train_twoBBdf=train_ETs, test_twoBBdf=test_ETs, nfolds=5, random_seed=random_seed, array_index=True, chunk_size=chunk_size)
+    ET_train_df = ET_train_df[train_probs>threshold] ; ET_test_df = ET_test_df[test_probs>threshold]
     print('\n\nSecond Stage Complete!!!\n\n')
-    return train_probs, test_probs
+    return ET_train_df, ET_test_df
 
 def thirdStage(train_TAG_df, test_TAG_df,  train_TB_scores, test_TB_scores, train_path=train_path, test_path=test_path, random_seed=42):
     """This function does not take a twobbdf object but just a normal pandas dataframe which comes from combing the

@@ -158,7 +158,7 @@ ET_dict = {
     'TwoBody_Extra_TRACKCHI2',
     'TwoBody_Extra_GHOST',
     'TwoBody_Extra_TYPE',
-    'TwoBody_Extra_FromSameB'
+    'TwoBody_Extra_FromSameB',
         
     'MissingM2',
     'Track1_Erest',

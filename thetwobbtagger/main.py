@@ -15,7 +15,7 @@ def main():
     # 2) EXTRA TRACKS (ETs)
     trainETs = twoBBdf(path=train_path, dict=ET_dict, specific_TBs=TB_train_df.index)
     testETs = twoBBdf(path=test_path, dict=ET_dict, specific_TBs=TB_test_df.index)
-    ET_train_df, ET_test_df = secondStage(train_ETs=trainETs, test_ETs=testETs, threshold=0.2, random_seed=42, chunk_size=200000)
+    ET_train_df, ET_test_df = secondStage(train_ETs=trainETs, test_ETs=testETs, threshold=0.2, random_seed=42, chunk_size=50000)
     del trainTBs, testTBs, trainETs, testETs ; gc.collect()
 
     # 2.5) Combine TBs and ETs and apply LOF calculation

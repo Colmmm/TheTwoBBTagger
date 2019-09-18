@@ -139,7 +139,7 @@ def LOF(dfx):
 
     return df_with_MM2_and_Etracks
 
-def combine(TB_COM_df, ET_COM_df, max_ETs=2):
+def combine(TB_COM_df, ET_COM_df, max_ETs=3):
     """"This function combines the TB_COM_df and the ET_COM_df together and works as the following:
         1) Get rid TB vertex duplicates, ie, so we only have one extra track per TB (call this dfA)
         2) Take note of what Extra tracks were kept in step 1), and remove them via their extra track index

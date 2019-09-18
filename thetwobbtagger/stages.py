@@ -2,7 +2,7 @@ from training import CV
 import pandas as pd
 from sklearn.metrics import accuracy_score
 from utils import score_combiner, preprocess4TAGGING
-train_path = '../TaggingJpsiK2012_fix_fix_1_withLOF.root'
+train_path = '../TaggingJpsiK2012_fix_fix_5_withLOF.root'
 test_path = '../TaggingJpsiK2012_tiny_fix_fix_withLOF.root'
 
 def firstStage(train_TBs, test_TBs ,threshold, chunk_size, random_seed=42):

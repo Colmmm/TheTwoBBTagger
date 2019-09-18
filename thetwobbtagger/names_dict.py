@@ -49,7 +49,11 @@ TB_dict={
     'Track2_ProbNNp',
     'Track2_ProbNNpi',
     'Track2_ProbNNmu',
-    'Track2_ProbNNghost'
+    'Track2_ProbNNghost',
+
+    'MissingM2',
+    'Track1_Erest',
+    'Track2_Erest'
     ],
 
     'flatMVA_key':[],
@@ -155,6 +159,11 @@ ET_dict = {
     'TwoBody_Extra_GHOST',
     'TwoBody_Extra_TYPE',
     'TwoBody_Extra_FromSameB'
+        
+    'MissingM2',
+    'Track1_Erest',
+    'Track2_Erest',
+    'TwoBody_Extra_Erest'
     ],
 
     'flatMVA_key':[
@@ -166,7 +175,9 @@ ET_dict = {
     'TwoBody_Extra_TRACKCHI2',
     'TwoBody_Extra_GHOST',
     'TwoBody_Extra_TYPE',
-    'TwoBody_Extra_FromSameB'],
+    'TwoBody_Extra_FromSameB',
+
+    'TwoBody_Extra_Erest'],
 
     'label_key': [
     'TwoBody_Extra_FromSameB'],
@@ -270,7 +281,12 @@ TAG_dict = {'ids': [
     'TwoBody_Extra_TRACKCHI2',
     'TwoBody_Extra_GHOST',
     'TwoBody_Extra_TYPE',
-    'TwoBody_Extra_FromSameB'
+    'TwoBody_Extra_FromSameB',
+
+    'MissingM2',
+    'Track1_Erest',
+    'Track2_Erest',
+    'TwoBody_Extra_Erest'
     ],
 
     'flatMVA_key':[
@@ -282,7 +298,9 @@ TAG_dict = {'ids': [
     'TwoBody_Extra_TRACKCHI2',
     'TwoBody_Extra_GHOST',
     'TwoBody_Extra_TYPE',
-    'TwoBody_Extra_FromSameB'],
+    'TwoBody_Extra_FromSameB',
+
+    'TwoBody_Extra_Erest'],
 
     'label_key': [
     'SignalB_ID'],

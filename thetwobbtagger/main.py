@@ -3,8 +3,8 @@ from stages import firstStage, secondStage, thirdStage
 from lof import LOF, combine
 from names_dict import TB_dict, ET_dict
 import gc ; gc.enable()
-train_path = '../TaggingJpsiK2012_tiny_fix_fix.root'
-test_path = '../TaggingJpsiK2012_tiny_fix_fixSlice2.root'
+train_path = '../TaggingJpsiK2012_fix_fix_1_withLOF.root'
+test_path = '../TaggingJpsiK2012_tiny_fix_fix_withLOF.root'
 
 def main():
     # 1) TWO BODYS (TBs)

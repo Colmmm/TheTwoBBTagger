@@ -10,12 +10,12 @@ def main():
     # 1) TWO BODYS (TBs)
     trainTBs = twoBBdf(path=train_path, dict=TB_dict)
     testTBs = twoBBdf(path=test_path, dict=TB_dict)
-    TB_train_df, TB_test_df, TB_train_scores, test_TB_scores = firstStage(train_TBs=trainTBs, test_TBs=testTBs, threshold=0.95, random_seed=42, chunk_size=200000)
+    TB_train_df, TB_test_df, TB_train_scores, test_TB_scores = firstStage(train_TBs=trainTBs, test_TBs=testTBs, threshold=0.165, random_seed=42, chunk_size=200000)
     
     # 2) EXTRA TRACKS (ETs)
     trainETs = twoBBdf(path=train_path, dict=ET_dict, specific_TBs=TB_train_df.index)
     testETs = twoBBdf(path=test_path, dict=ET_dict, specific_TBs=TB_test_df.index)
-    ET_train_df, ET_test_df = secondStage(train_ETs=trainETs, test_ETs=testETs, threshold=0.5, random_seed=42, chunk_size=200000)
+    ET_train_df, ET_test_df = secondStage(train_ETs=trainETs, test_ETs=testETs, threshold=0.2, random_seed=42, chunk_size=200000)
     del trainTBs, testTBs, trainETs, testETs ; gc.collect()
 
     # 2.5) Combine TBs and ETs and apply LOF calculation

@@ -4,14 +4,14 @@ from lof import LOF, combine
 from names_dict import TB_dict, ET_dict
 
 import gc ; gc.enable()
-train_path = '../TaggingJpsiK2012_fix_fix_1_withLOF.root'
+train_path = '../TaggingJpsiK2012_fix_fix_5_withLOF.root'
 test_path = '../TaggingJpsiK2012_tiny_fix_fix_withLOF.root'
 
 def main():
     # 1) TWO BODYS (TBs)
     trainTBs = twoBBdf(path=train_path, dict=TB_dict)
     testTBs = twoBBdf(path=test_path, dict=TB_dict)
-    TB_train_df, TB_test_df, TB_train_scores, test_TB_scores = firstStage(train_TBs=trainTBs, test_TBs=testTBs, threshold=0.165, random_seed=42, chunk_size=200000)
+    TB_train_df, TB_test_df, TB_train_scores, test_TB_scores = firstStage(train_TBs=trainTBs, test_TBs=testTBs, threshold=0.85, random_seed=42, chunk_size=200000)
     
     # 2) EXTRA TRACKS (ETs)
     trainETs = twoBBdf(path=train_path, dict=ET_dict, specific_TBs=TB_train_df.index)
